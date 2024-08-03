@@ -1,0 +1,39 @@
+{
+  "name": "backend",
+  "private": true,
+  "scripts": {
+    "dev": "keystone dev",
+    "start": "keystone start",
+    "build": "keystone build",
+    "studio": "keystone prisma studio",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "postinstall": "keystone build --no-ui --frozen"
+  },
+  "dependencies": {
+    "@keystone-6/auth": "^7.0.0",
+    "@keystone-6/core": "^5.0.0",
+    "@keystone-6/fields-document": "^7.0.0",
+    "@react-email/components": "^0.0.22",
+    "@repo/transactional": "*",
+    "@urql/exchange-auth": "^2.2.0",
+    "bullmq": "^5.10.4",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "googleapis": "^140.0.1",
+    "ioredis": "^5.4.1",
+    "nodemailer": "^6.9.14",
+    "react": "^18.3.1",
+    "typescript": "^4.9.5",
+    "ua-parser-js": "^1.0.38",
+    "uuid": "^10.0.0",
+    "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.24.8",
+    "@babel/preset-typescript": "^7.24.7",
+    "@types/cookie": "^0.6.0",
+    "@types/nodemailer": "^6.4.15",
+    "@types/uuid": "^10.0.0"
+  }
+}

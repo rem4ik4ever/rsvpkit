@@ -1,0 +1,24 @@
+{
+  "name": "@repo/transactional",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "serve": "email dev -p 3030",
+    "build": "tsup src/index.tsx --format esm,cjs --dts --external react",
+    "dev": "tsup ./index.tsx --format esm,cjs --watch --dts --external react",
+    "export": "email export"
+  },
+  "dependencies": {
+    "@react-email/components": "0.0.22",
+    "react": "^18.2.0",
+    "react-email": "2.1.6"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.33",
+    "@types/react-dom": "18.2.14",
+    "tsup": "^8.2.3"
+  }
+}
