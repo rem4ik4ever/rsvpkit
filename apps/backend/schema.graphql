@@ -146,6 +146,8 @@ type User {
   teamMember(where: TeamMemberWhereInput! = {}, orderBy: [TeamMemberOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TeamMemberWhereUniqueInput): [TeamMember!]
   teamMemberCount(where: TeamMemberWhereInput! = {}): Int
   currentTeam: Team
+  events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
+  eventsCount(where: EventWhereInput! = {}): Int
   emailConfirmedAt: DateTime
   avatarUrl: String
   createdAt: DateTime
@@ -172,6 +174,7 @@ input UserWhereInput {
   accounts: AccountManyRelationFilter
   teamMember: TeamMemberManyRelationFilter
   currentTeam: TeamWhereInput
+  events: EventManyRelationFilter
   emailConfirmedAt: DateTimeNullableFilter
   avatarUrl: StringFilter
   createdAt: DateTimeNullableFilter
@@ -194,6 +197,12 @@ input TeamMemberManyRelationFilter {
   every: TeamMemberWhereInput
   some: TeamMemberWhereInput
   none: TeamMemberWhereInput
+}
+
+input EventManyRelationFilter {
+  every: EventWhereInput
+  some: EventWhereInput
+  none: EventWhereInput
 }
 
 input BooleanFilter {
@@ -219,6 +228,7 @@ input UserUpdateInput {
   accounts: AccountRelateToManyForUpdateInput
   teamMember: TeamMemberRelateToManyForUpdateInput
   currentTeam: TeamRelateToOneForUpdateInput
+  events: EventRelateToManyForUpdateInput
   emailConfirmedAt: DateTime
   avatarUrl: String
   createdAt: DateTime
@@ -252,6 +262,13 @@ input TeamRelateToOneForUpdateInput {
   disconnect: Boolean
 }
 
+input EventRelateToManyForUpdateInput {
+  disconnect: [EventWhereUniqueInput!]
+  set: [EventWhereUniqueInput!]
+  create: [EventCreateInput!]
+  connect: [EventWhereUniqueInput!]
+}
+
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
   data: UserUpdateInput!
@@ -265,6 +282,7 @@ input UserCreateInput {
   accounts: AccountRelateToManyForCreateInput
   teamMember: TeamMemberRelateToManyForCreateInput
   currentTeam: TeamRelateToOneForCreateInput
+  events: EventRelateToManyForCreateInput
   emailConfirmedAt: DateTime
   avatarUrl: String
   createdAt: DateTime
@@ -289,6 +307,11 @@ input TeamMemberRelateToManyForCreateInput {
 input TeamRelateToOneForCreateInput {
   create: TeamCreateInput
   connect: TeamWhereUniqueInput
+}
+
+input EventRelateToManyForCreateInput {
+  create: [EventCreateInput!]
+  connect: [EventWhereUniqueInput!]
 }
 
 type TeamMember {
@@ -369,6 +392,8 @@ type Team {
   description: String
   members(where: TeamMemberWhereInput! = {}, orderBy: [TeamMemberOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TeamMemberWhereUniqueInput): [TeamMember!]
   membersCount(where: TeamMemberWhereInput! = {}): Int
+  events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
+  eventsCount(where: EventWhereInput! = {}): Int
   createdAt: DateTime
 }
 
@@ -384,6 +409,7 @@ input TeamWhereInput {
   name: StringFilter
   description: StringFilter
   members: TeamMemberManyRelationFilter
+  events: EventManyRelationFilter
   createdAt: DateTimeNullableFilter
 }
 
@@ -398,6 +424,7 @@ input TeamUpdateInput {
   name: String
   description: String
   members: TeamMemberRelateToManyForUpdateInput
+  events: EventRelateToManyForUpdateInput
   createdAt: DateTime
 }
 
@@ -410,6 +437,7 @@ input TeamCreateInput {
   name: String
   description: String
   members: TeamMemberRelateToManyForCreateInput
+  events: EventRelateToManyForCreateInput
   createdAt: DateTime
 }
 
@@ -502,6 +530,79 @@ input AccountCreateInput {
   refresh_token_expires_at: DateTime
 }
 
+type Event {
+  id: ID!
+  name: String
+  starts_at: String
+  type: String
+  location: String
+  createdBy: User
+  team: Team
+  published_at: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input EventWhereUniqueInput {
+  id: ID
+}
+
+input EventWhereInput {
+  AND: [EventWhereInput!]
+  OR: [EventWhereInput!]
+  NOT: [EventWhereInput!]
+  id: IDFilter
+  name: StringFilter
+  starts_at: StringFilter
+  type: StringNullableFilter
+  location: StringFilter
+  createdBy: UserWhereInput
+  team: TeamWhereInput
+  published_at: DateTimeNullableFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input EventOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  starts_at: OrderDirection
+  type: OrderDirection
+  location: OrderDirection
+  published_at: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input EventUpdateInput {
+  name: String
+  starts_at: String
+  type: String
+  location: String
+  createdBy: UserRelateToOneForUpdateInput
+  team: TeamRelateToOneForUpdateInput
+  published_at: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input EventUpdateArgs {
+  where: EventWhereUniqueInput!
+  data: EventUpdateInput!
+}
+
+input EventCreateInput {
+  name: String
+  starts_at: String
+  type: String
+  location: String
+  createdBy: UserRelateToOneForCreateInput
+  team: TeamRelateToOneForCreateInput
+  published_at: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -538,6 +639,12 @@ type Mutation {
   updateAccounts(data: [AccountUpdateArgs!]!): [Account]
   deleteAccount(where: AccountWhereUniqueInput!): Account
   deleteAccounts(where: [AccountWhereUniqueInput!]!): [Account]
+  createEvent(data: EventCreateInput!): Event
+  createEvents(data: [EventCreateInput!]!): [Event]
+  updateEvent(where: EventWhereUniqueInput!, data: EventUpdateInput!): Event
+  updateEvents(data: [EventUpdateArgs!]!): [Event]
+  deleteEvent(where: EventWhereUniqueInput!): Event
+  deleteEvents(where: [EventWhereUniqueInput!]!): [Event]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -576,6 +683,9 @@ type Query {
   accounts(where: AccountWhereInput! = {}, orderBy: [AccountOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: AccountWhereUniqueInput): [Account!]
   account(where: AccountWhereUniqueInput!): Account
   accountsCount(where: AccountWhereInput! = {}): Int
+  events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
+  event(where: EventWhereUniqueInput!): Event
+  eventsCount(where: EventWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

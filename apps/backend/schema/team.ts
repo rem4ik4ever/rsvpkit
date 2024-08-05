@@ -8,6 +8,7 @@ export const TeamSchema = list({
     name: text({ validation: { isRequired: true } }),
     description: text(),
     members: relationship({ ref: 'TeamMember.team', many: true }),
+    events: relationship({ ref: 'Event.team', many: true }),
     createdAt: timestamp({
       defaultValue: { kind: 'now' }
     }),

@@ -3,11 +3,13 @@ import { UserSchema } from './user'
 import { TeamMemberSchema } from './team-member'
 import { TeamSchema } from './team'
 import { AccountSchema } from './account'
+import { EventSchema } from './event'
 
 export const lists = {
   Session: SessionSchema,
   User: UserSchema,
   TeamMember: TeamMemberSchema,
   Team: TeamSchema,
-  Account: AccountSchema
+  Account: AccountSchema,
+  Event: EventSchema,
 };

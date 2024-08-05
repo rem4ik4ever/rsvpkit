@@ -33,7 +33,7 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core6 = require("@keystone-6/core");
+var import_core7 = require("@keystone-6/core");
 
 // schema/session.ts
 var import_core = require("@keystone-6/core");
@@ -198,6 +198,7 @@ var UserSchema = (0, import_core2.list)({
     accounts: (0, import_fields2.relationship)({ ref: "Account.user", many: true }),
     teamMember: (0, import_fields2.relationship)({ ref: "TeamMember.user", many: true }),
     currentTeam: (0, import_fields2.relationship)({ ref: "Team", many: false }),
+    events: (0, import_fields2.relationship)({ ref: "Event.createdBy", many: true }),
     emailConfirmedAt: (0, import_fields2.timestamp)(),
     avatarUrl: (0, import_fields2.text)(),
     createdAt: (0, import_fields2.timestamp)({
@@ -259,6 +260,7 @@ var TeamSchema = (0, import_core4.list)({
     name: (0, import_fields4.text)({ validation: { isRequired: true } }),
     description: (0, import_fields4.text)(),
     members: (0, import_fields4.relationship)({ ref: "TeamMember.team", many: true }),
+    events: (0, import_fields4.relationship)({ ref: "Event.team", many: true }),
     createdAt: (0, import_fields4.timestamp)({
       defaultValue: { kind: "now" }
     })
@@ -287,13 +289,48 @@ var AccountSchema = (0, import_core5.list)({
   }
 });
 
+// schema/event.ts
+var import_core6 = require("@keystone-6/core");
+var import_access6 = require("@keystone-6/core/access");
+var import_fields6 = require("@keystone-6/core/fields");
+var EventSchema = (0, import_core6.list)({
+  access: import_access6.allowAll,
+  fields: {
+    name: (0, import_fields6.text)({ validation: { isRequired: true } }),
+    starts_at: (0, import_fields6.text)({ validation: { isRequired: true } }),
+    ends_at: (0, import_fields6.text)({ validation: { isRequired: true } }),
+    type: (0, import_fields6.select)({
+      options: [
+        "wedding",
+        "birthday",
+        "conference",
+        "meetup",
+        "party"
+      ]
+    }),
+    location: (0, import_fields6.text)(),
+    createdBy: (0, import_fields6.relationship)({ ref: "User.events", many: false }),
+    team: (0, import_fields6.relationship)({ ref: "Team.events", many: false }),
+    published_at: (0, import_fields6.timestamp)(),
+    createdAt: (0, import_fields6.timestamp)({
+      defaultValue: { kind: "now" }
+    }),
+    updatedAt: (0, import_fields6.timestamp)({
+      db: {
+        updatedAt: true
+      }
+    })
+  }
+});
+
 // schema/index.ts
 var lists = {
   Session: SessionSchema,
   User: UserSchema,
   TeamMember: TeamMemberSchema,
   Team: TeamSchema,
-  Account: AccountSchema
+  Account: AccountSchema,
+  Event: EventSchema
 };
 
 // auth.ts
@@ -614,7 +651,7 @@ var extendExpressApp = (app, commonContext) => {
 // keystone.ts
 var allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 var keystone_default = withAuth(
-  (0, import_core6.config)({
+  (0, import_core7.config)({
     server: {
       port: parseInt(process.env.PORT, 10) || 3300,
       cors: {

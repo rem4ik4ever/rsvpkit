@@ -35,6 +35,7 @@ model User {
   teamMember       TeamMember[] @relation("TeamMember_user")
   currentTeam      Team?        @relation("User_currentTeam", fields: [currentTeamId], references: [id])
   currentTeamId    String?      @map("currentTeam")
+  events           Event[]      @relation("Event_createdBy")
   emailConfirmedAt DateTime?
   avatarUrl        String       @default("")
   createdAt        DateTime?    @default(now())
@@ -63,6 +64,7 @@ model Team {
   name                  String       @default("")
   description           String       @default("")
   members               TeamMember[] @relation("TeamMember_team")
+  events                Event[]      @relation("Event_team")
   createdAt             DateTime?    @default(now())
   from_User_currentTeam User[]       @relation("User_currentTeam")
 }
@@ -84,4 +86,22 @@ model Account {
   refresh_token_expires_at DateTime?
 
   @@index([userId])
+}
+
+model Event {
+  id           String    @id @default(cuid())
+  name         String    @default("")
+  starts_at    String    @default("")
+  type         String?
+  location     String    @default("")
+  createdBy    User?     @relation("Event_createdBy", fields: [createdById], references: [id])
+  createdById  String?   @map("createdBy")
+  team         Team?     @relation("Event_team", fields: [teamId], references: [id])
+  teamId       String?   @map("team")
+  published_at DateTime?
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime? @updatedAt
+
+  @@index([createdById])
+  @@index([teamId])
 }

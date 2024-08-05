@@ -6,6 +6,7 @@ import { AiOutlineCloseCircle, AiFillInstagram } from "react-icons/ai";
 import { BsDiscord } from "react-icons/bs";
 import { FaTwitter } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
+import { Button } from "@/components/ui/button";
 
 // MenuItems JSON
 const menuItems = [
@@ -134,9 +135,9 @@ function Navbar() {
           </div>
           <div className="header-button space-x-2">
             <div className="hidden lg:flex lg:items-center">
-              <button className="flex items-center text-white bg-[#54BD95] justify-center rounded-full border border-black px-6 py-2.5 font-semibold hover:shadow-lg hover:drop-shadow transition duration-200">
-                <span>Join now</span>
-              </button>
+              <Button size="lg">
+                Join now
+              </Button>
             </div>
           </div>
           <div className="flex items-center justify-center lg:hidden">

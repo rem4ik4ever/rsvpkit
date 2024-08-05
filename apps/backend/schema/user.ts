@@ -40,6 +40,8 @@ export const UserSchema = list({
 
     currentTeam: relationship({ ref: 'Team', many: false }),
 
+    events: relationship({ ref: 'Event.createdBy', many: true }),
+
     emailConfirmedAt: timestamp(),
 
     avatarUrl: text(),
