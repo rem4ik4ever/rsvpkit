@@ -8,6 +8,9 @@ query AuthenticatedItem {
       __typename
       id
       name
+      firstName
+      lastName
+      avatarUrl
       email
       emailConfirmedAt
       createdAt

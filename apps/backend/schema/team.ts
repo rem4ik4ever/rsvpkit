@@ -9,6 +9,7 @@ export const TeamSchema = list({
     description: text(),
     members: relationship({ ref: 'TeamMember.team', many: true }),
     events: relationship({ ref: 'Event.team', many: true }),
+    subscription: relationship({ ref: 'Subscription.team', many: false }),
     createdAt: timestamp({
       defaultValue: { kind: 'now' }
     }),

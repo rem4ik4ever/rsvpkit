@@ -137,6 +137,8 @@ input UserRelateToOneForCreateInput {
 type User {
   id: ID!
   name: String
+  firstName: String
+  lastName: String
   email: String
   password: PasswordState
   sessions(where: SessionWhereInput! = {}, orderBy: [SessionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SessionWhereUniqueInput): [Session!]
@@ -148,6 +150,8 @@ type User {
   currentTeam: Team
   events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
   eventsCount(where: EventWhereInput! = {}): Int
+  subscriptions(where: SubscriptionWhereInput! = {}, orderBy: [SubscriptionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SubscriptionWhereUniqueInput): [Subscription!]
+  subscriptionsCount(where: SubscriptionWhereInput! = {}): Int
   emailConfirmedAt: DateTime
   avatarUrl: String
   createdAt: DateTime
@@ -169,12 +173,15 @@ input UserWhereInput {
   NOT: [UserWhereInput!]
   id: IDFilter
   name: StringFilter
+  firstName: StringFilter
+  lastName: StringFilter
   email: StringFilter
   sessions: SessionManyRelationFilter
   accounts: AccountManyRelationFilter
   teamMember: TeamMemberManyRelationFilter
   currentTeam: TeamWhereInput
   events: EventManyRelationFilter
+  subscriptions: SubscriptionManyRelationFilter
   emailConfirmedAt: DateTimeNullableFilter
   avatarUrl: StringFilter
   createdAt: DateTimeNullableFilter
@@ -205,6 +212,12 @@ input EventManyRelationFilter {
   none: EventWhereInput
 }
 
+input SubscriptionManyRelationFilter {
+  every: SubscriptionWhereInput
+  some: SubscriptionWhereInput
+  none: SubscriptionWhereInput
+}
+
 input BooleanFilter {
   equals: Boolean
   not: BooleanFilter
@@ -213,6 +226,8 @@ input BooleanFilter {
 input UserOrderByInput {
   id: OrderDirection
   name: OrderDirection
+  firstName: OrderDirection
+  lastName: OrderDirection
   email: OrderDirection
   emailConfirmedAt: OrderDirection
   avatarUrl: OrderDirection
@@ -222,6 +237,8 @@ input UserOrderByInput {
 
 input UserUpdateInput {
   name: String
+  firstName: String
+  lastName: String
   email: String
   password: String
   sessions: SessionRelateToManyForUpdateInput
@@ -229,6 +246,7 @@ input UserUpdateInput {
   teamMember: TeamMemberRelateToManyForUpdateInput
   currentTeam: TeamRelateToOneForUpdateInput
   events: EventRelateToManyForUpdateInput
+  subscriptions: SubscriptionRelateToManyForUpdateInput
   emailConfirmedAt: DateTime
   avatarUrl: String
   createdAt: DateTime
@@ -269,6 +287,13 @@ input EventRelateToManyForUpdateInput {
   connect: [EventWhereUniqueInput!]
 }
 
+input SubscriptionRelateToManyForUpdateInput {
+  disconnect: [SubscriptionWhereUniqueInput!]
+  set: [SubscriptionWhereUniqueInput!]
+  create: [SubscriptionCreateInput!]
+  connect: [SubscriptionWhereUniqueInput!]
+}
+
 input UserUpdateArgs {
   where: UserWhereUniqueInput!
   data: UserUpdateInput!
@@ -276,6 +301,8 @@ input UserUpdateArgs {
 
 input UserCreateInput {
   name: String
+  firstName: String
+  lastName: String
   email: String
   password: String
   sessions: SessionRelateToManyForCreateInput
@@ -283,6 +310,7 @@ input UserCreateInput {
   teamMember: TeamMemberRelateToManyForCreateInput
   currentTeam: TeamRelateToOneForCreateInput
   events: EventRelateToManyForCreateInput
+  subscriptions: SubscriptionRelateToManyForCreateInput
   emailConfirmedAt: DateTime
   avatarUrl: String
   createdAt: DateTime
@@ -312,6 +340,11 @@ input TeamRelateToOneForCreateInput {
 input EventRelateToManyForCreateInput {
   create: [EventCreateInput!]
   connect: [EventWhereUniqueInput!]
+}
+
+input SubscriptionRelateToManyForCreateInput {
+  create: [SubscriptionCreateInput!]
+  connect: [SubscriptionWhereUniqueInput!]
 }
 
 type TeamMember {
@@ -394,6 +427,7 @@ type Team {
   membersCount(where: TeamMemberWhereInput! = {}): Int
   events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
   eventsCount(where: EventWhereInput! = {}): Int
+  subscription: Subscription
   createdAt: DateTime
 }
 
@@ -410,6 +444,7 @@ input TeamWhereInput {
   description: StringFilter
   members: TeamMemberManyRelationFilter
   events: EventManyRelationFilter
+  subscription: SubscriptionWhereInput
   createdAt: DateTimeNullableFilter
 }
 
@@ -425,7 +460,14 @@ input TeamUpdateInput {
   description: String
   members: TeamMemberRelateToManyForUpdateInput
   events: EventRelateToManyForUpdateInput
+  subscription: SubscriptionRelateToOneForUpdateInput
   createdAt: DateTime
+}
+
+input SubscriptionRelateToOneForUpdateInput {
+  create: SubscriptionCreateInput
+  connect: SubscriptionWhereUniqueInput
+  disconnect: Boolean
 }
 
 input TeamUpdateArgs {
@@ -438,7 +480,13 @@ input TeamCreateInput {
   description: String
   members: TeamMemberRelateToManyForCreateInput
   events: EventRelateToManyForCreateInput
+  subscription: SubscriptionRelateToOneForCreateInput
   createdAt: DateTime
+}
+
+input SubscriptionRelateToOneForCreateInput {
+  create: SubscriptionCreateInput
+  connect: SubscriptionWhereUniqueInput
 }
 
 type Account {
@@ -533,14 +581,21 @@ input AccountCreateInput {
 type Event {
   id: ID!
   name: String
-  starts_at: String
+  startsAt: DateTime
+  endsAt: DateTime
   type: String
-  location: String
+  location: JSON
   createdBy: User
   team: Team
-  published_at: DateTime
+  publishedAt: DateTime
   createdAt: DateTime
   updatedAt: DateTime
+  plusOneAllowed: Boolean
+  capacity: Int
+  stages(where: EventStageWhereInput! = {}, orderBy: [EventStageOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventStageWhereUniqueInput): [EventStage!]
+  stagesCount(where: EventStageWhereInput! = {}): Int
+  invitations(where: InvitationWhereInput! = {}, orderBy: [InvitationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: InvitationWhereUniqueInput): [Invitation!]
+  invitationsCount(where: InvitationWhereInput! = {}): Int
 }
 
 input EventWhereUniqueInput {
@@ -553,37 +608,96 @@ input EventWhereInput {
   NOT: [EventWhereInput!]
   id: IDFilter
   name: StringFilter
-  starts_at: StringFilter
+  startsAt: DateTimeFilter
+  endsAt: DateTimeFilter
   type: StringNullableFilter
-  location: StringFilter
   createdBy: UserWhereInput
   team: TeamWhereInput
-  published_at: DateTimeNullableFilter
+  publishedAt: DateTimeNullableFilter
   createdAt: DateTimeNullableFilter
   updatedAt: DateTimeNullableFilter
+  plusOneAllowed: BooleanFilter
+  capacity: IntNullableFilter
+  stages: EventStageManyRelationFilter
+  invitations: InvitationManyRelationFilter
+}
+
+input DateTimeFilter {
+  equals: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+  not: DateTimeFilter
+}
+
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
+}
+
+input EventStageManyRelationFilter {
+  every: EventStageWhereInput
+  some: EventStageWhereInput
+  none: EventStageWhereInput
+}
+
+input InvitationManyRelationFilter {
+  every: InvitationWhereInput
+  some: InvitationWhereInput
+  none: InvitationWhereInput
 }
 
 input EventOrderByInput {
   id: OrderDirection
   name: OrderDirection
-  starts_at: OrderDirection
+  startsAt: OrderDirection
+  endsAt: OrderDirection
   type: OrderDirection
-  location: OrderDirection
-  published_at: OrderDirection
+  publishedAt: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
+  plusOneAllowed: OrderDirection
+  capacity: OrderDirection
 }
 
 input EventUpdateInput {
   name: String
-  starts_at: String
+  startsAt: DateTime
+  endsAt: DateTime
   type: String
-  location: String
+  location: JSON
   createdBy: UserRelateToOneForUpdateInput
   team: TeamRelateToOneForUpdateInput
-  published_at: DateTime
+  publishedAt: DateTime
   createdAt: DateTime
   updatedAt: DateTime
+  plusOneAllowed: Boolean
+  capacity: Int
+  stages: EventStageRelateToManyForUpdateInput
+  invitations: InvitationRelateToManyForUpdateInput
+}
+
+input EventStageRelateToManyForUpdateInput {
+  disconnect: [EventStageWhereUniqueInput!]
+  set: [EventStageWhereUniqueInput!]
+  create: [EventStageCreateInput!]
+  connect: [EventStageWhereUniqueInput!]
+}
+
+input InvitationRelateToManyForUpdateInput {
+  disconnect: [InvitationWhereUniqueInput!]
+  set: [InvitationWhereUniqueInput!]
+  create: [InvitationCreateInput!]
+  connect: [InvitationWhereUniqueInput!]
 }
 
 input EventUpdateArgs {
@@ -593,14 +707,452 @@ input EventUpdateArgs {
 
 input EventCreateInput {
   name: String
-  starts_at: String
+  startsAt: DateTime
+  endsAt: DateTime
   type: String
-  location: String
+  location: JSON
   createdBy: UserRelateToOneForCreateInput
   team: TeamRelateToOneForCreateInput
-  published_at: DateTime
+  publishedAt: DateTime
   createdAt: DateTime
   updatedAt: DateTime
+  plusOneAllowed: Boolean
+  capacity: Int
+  stages: EventStageRelateToManyForCreateInput
+  invitations: InvitationRelateToManyForCreateInput
+}
+
+input EventStageRelateToManyForCreateInput {
+  create: [EventStageCreateInput!]
+  connect: [EventStageWhereUniqueInput!]
+}
+
+input InvitationRelateToManyForCreateInput {
+  create: [InvitationCreateInput!]
+  connect: [InvitationWhereUniqueInput!]
+}
+
+type EventStage {
+  id: ID!
+  name: String
+  event: Event
+  location: JSON
+  stageDate: DateTime
+  startTime: String
+  endTime: String
+  description: String
+  capacity: Int
+  createdAt: DateTime
+  updatedAt: DateTime
+  attendance(where: GuestAttendanceWhereInput! = {}, orderBy: [GuestAttendanceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: GuestAttendanceWhereUniqueInput): [GuestAttendance!]
+  attendanceCount(where: GuestAttendanceWhereInput! = {}): Int
+}
+
+input EventStageWhereUniqueInput {
+  id: ID
+}
+
+input EventStageWhereInput {
+  AND: [EventStageWhereInput!]
+  OR: [EventStageWhereInput!]
+  NOT: [EventStageWhereInput!]
+  id: IDFilter
+  name: StringFilter
+  event: EventWhereInput
+  stageDate: DateTimeFilter
+  startTime: StringFilter
+  endTime: StringFilter
+  description: StringFilter
+  capacity: IntNullableFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+  attendance: GuestAttendanceManyRelationFilter
+}
+
+input GuestAttendanceManyRelationFilter {
+  every: GuestAttendanceWhereInput
+  some: GuestAttendanceWhereInput
+  none: GuestAttendanceWhereInput
+}
+
+input EventStageOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  stageDate: OrderDirection
+  startTime: OrderDirection
+  endTime: OrderDirection
+  description: OrderDirection
+  capacity: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input EventStageUpdateInput {
+  name: String
+  event: EventRelateToOneForUpdateInput
+  location: JSON
+  stageDate: DateTime
+  startTime: String
+  endTime: String
+  description: String
+  capacity: Int
+  createdAt: DateTime
+  updatedAt: DateTime
+  attendance: GuestAttendanceRelateToManyForUpdateInput
+}
+
+input EventRelateToOneForUpdateInput {
+  create: EventCreateInput
+  connect: EventWhereUniqueInput
+  disconnect: Boolean
+}
+
+input GuestAttendanceRelateToManyForUpdateInput {
+  disconnect: [GuestAttendanceWhereUniqueInput!]
+  set: [GuestAttendanceWhereUniqueInput!]
+  create: [GuestAttendanceCreateInput!]
+  connect: [GuestAttendanceWhereUniqueInput!]
+}
+
+input EventStageUpdateArgs {
+  where: EventStageWhereUniqueInput!
+  data: EventStageUpdateInput!
+}
+
+input EventStageCreateInput {
+  name: String
+  event: EventRelateToOneForCreateInput
+  location: JSON
+  stageDate: DateTime
+  startTime: String
+  endTime: String
+  description: String
+  capacity: Int
+  createdAt: DateTime
+  updatedAt: DateTime
+  attendance: GuestAttendanceRelateToManyForCreateInput
+}
+
+input EventRelateToOneForCreateInput {
+  create: EventCreateInput
+  connect: EventWhereUniqueInput
+}
+
+input GuestAttendanceRelateToManyForCreateInput {
+  create: [GuestAttendanceCreateInput!]
+  connect: [GuestAttendanceWhereUniqueInput!]
+}
+
+type GuestAttendance {
+  id: ID!
+  invitation: Invitation
+  stage: EventStage
+  attending: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input GuestAttendanceWhereUniqueInput {
+  id: ID
+}
+
+input GuestAttendanceWhereInput {
+  AND: [GuestAttendanceWhereInput!]
+  OR: [GuestAttendanceWhereInput!]
+  NOT: [GuestAttendanceWhereInput!]
+  id: IDFilter
+  invitation: InvitationWhereInput
+  stage: EventStageWhereInput
+  attending: BooleanFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input GuestAttendanceOrderByInput {
+  id: OrderDirection
+  attending: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input GuestAttendanceUpdateInput {
+  invitation: InvitationRelateToOneForUpdateInput
+  stage: EventStageRelateToOneForUpdateInput
+  attending: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input InvitationRelateToOneForUpdateInput {
+  create: InvitationCreateInput
+  connect: InvitationWhereUniqueInput
+  disconnect: Boolean
+}
+
+input EventStageRelateToOneForUpdateInput {
+  create: EventStageCreateInput
+  connect: EventStageWhereUniqueInput
+  disconnect: Boolean
+}
+
+input GuestAttendanceUpdateArgs {
+  where: GuestAttendanceWhereUniqueInput!
+  data: GuestAttendanceUpdateInput!
+}
+
+input GuestAttendanceCreateInput {
+  invitation: InvitationRelateToOneForCreateInput
+  stage: EventStageRelateToOneForCreateInput
+  attending: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input InvitationRelateToOneForCreateInput {
+  create: InvitationCreateInput
+  connect: InvitationWhereUniqueInput
+}
+
+input EventStageRelateToOneForCreateInput {
+  create: EventStageCreateInput
+  connect: EventStageWhereUniqueInput
+}
+
+type Guest {
+  id: ID!
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  address: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+  invitations(where: InvitationWhereInput! = {}, orderBy: [InvitationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: InvitationWhereUniqueInput): [Invitation!]
+  invitationsCount(where: InvitationWhereInput! = {}): Int
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input GuestWhereUniqueInput {
+  id: ID
+}
+
+input GuestWhereInput {
+  AND: [GuestWhereInput!]
+  OR: [GuestWhereInput!]
+  NOT: [GuestWhereInput!]
+  id: IDFilter
+  firstName: StringFilter
+  lastName: StringFilter
+  email: StringFilter
+  phone: StringFilter
+  address: StringFilter
+  city: StringFilter
+  state: StringFilter
+  zipCode: StringFilter
+  country: StringFilter
+  invitations: InvitationManyRelationFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input GuestOrderByInput {
+  id: OrderDirection
+  firstName: OrderDirection
+  lastName: OrderDirection
+  email: OrderDirection
+  phone: OrderDirection
+  address: OrderDirection
+  city: OrderDirection
+  state: OrderDirection
+  zipCode: OrderDirection
+  country: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input GuestUpdateInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  address: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+  invitations: InvitationRelateToManyForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input GuestUpdateArgs {
+  where: GuestWhereUniqueInput!
+  data: GuestUpdateInput!
+}
+
+input GuestCreateInput {
+  firstName: String
+  lastName: String
+  email: String
+  phone: String
+  address: String
+  city: String
+  state: String
+  zipCode: String
+  country: String
+  invitations: InvitationRelateToManyForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type Invitation {
+  id: ID!
+  event: Event
+  guest: Guest
+  sentDate: DateTime
+  response: String
+  plusOneName: String
+  plusOneAllowed: Boolean
+  notes: String
+  attendance(where: GuestAttendanceWhereInput! = {}, orderBy: [GuestAttendanceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: GuestAttendanceWhereUniqueInput): [GuestAttendance!]
+  attendanceCount(where: GuestAttendanceWhereInput! = {}): Int
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input InvitationWhereUniqueInput {
+  id: ID
+}
+
+input InvitationWhereInput {
+  AND: [InvitationWhereInput!]
+  OR: [InvitationWhereInput!]
+  NOT: [InvitationWhereInput!]
+  id: IDFilter
+  event: EventWhereInput
+  guest: GuestWhereInput
+  sentDate: DateTimeNullableFilter
+  response: StringNullableFilter
+  plusOneName: StringFilter
+  plusOneAllowed: BooleanFilter
+  notes: StringFilter
+  attendance: GuestAttendanceManyRelationFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input InvitationOrderByInput {
+  id: OrderDirection
+  sentDate: OrderDirection
+  response: OrderDirection
+  plusOneName: OrderDirection
+  plusOneAllowed: OrderDirection
+  notes: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input InvitationUpdateInput {
+  event: EventRelateToOneForUpdateInput
+  guest: GuestRelateToOneForUpdateInput
+  sentDate: DateTime
+  response: String
+  plusOneName: String
+  plusOneAllowed: Boolean
+  notes: String
+  attendance: GuestAttendanceRelateToManyForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input GuestRelateToOneForUpdateInput {
+  create: GuestCreateInput
+  connect: GuestWhereUniqueInput
+  disconnect: Boolean
+}
+
+input InvitationUpdateArgs {
+  where: InvitationWhereUniqueInput!
+  data: InvitationUpdateInput!
+}
+
+input InvitationCreateInput {
+  event: EventRelateToOneForCreateInput
+  guest: GuestRelateToOneForCreateInput
+  sentDate: DateTime
+  response: String
+  plusOneName: String
+  plusOneAllowed: Boolean
+  notes: String
+  attendance: GuestAttendanceRelateToManyForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input GuestRelateToOneForCreateInput {
+  create: GuestCreateInput
+  connect: GuestWhereUniqueInput
+}
+
+type Subscription {
+  id: ID!
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  stripePriceId: String
+  stripeCurrentPeriodEnd: DateTime
+  user: User
+  team: Team
+}
+
+input SubscriptionWhereUniqueInput {
+  id: ID
+}
+
+input SubscriptionWhereInput {
+  AND: [SubscriptionWhereInput!]
+  OR: [SubscriptionWhereInput!]
+  NOT: [SubscriptionWhereInput!]
+  id: IDFilter
+  stripeCustomerId: StringFilter
+  stripeSubscriptionId: StringFilter
+  stripePriceId: StringFilter
+  stripeCurrentPeriodEnd: DateTimeNullableFilter
+  user: UserWhereInput
+  team: TeamWhereInput
+}
+
+input SubscriptionOrderByInput {
+  id: OrderDirection
+  stripeCustomerId: OrderDirection
+  stripeSubscriptionId: OrderDirection
+  stripePriceId: OrderDirection
+  stripeCurrentPeriodEnd: OrderDirection
+}
+
+input SubscriptionUpdateInput {
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  stripePriceId: String
+  stripeCurrentPeriodEnd: DateTime
+  user: UserRelateToOneForUpdateInput
+  team: TeamRelateToOneForUpdateInput
+}
+
+input SubscriptionUpdateArgs {
+  where: SubscriptionWhereUniqueInput!
+  data: SubscriptionUpdateInput!
+}
+
+input SubscriptionCreateInput {
+  stripeCustomerId: String
+  stripeSubscriptionId: String
+  stripePriceId: String
+  stripeCurrentPeriodEnd: DateTime
+  user: UserRelateToOneForCreateInput
+  team: TeamRelateToOneForCreateInput
 }
 
 """
@@ -645,6 +1197,36 @@ type Mutation {
   updateEvents(data: [EventUpdateArgs!]!): [Event]
   deleteEvent(where: EventWhereUniqueInput!): Event
   deleteEvents(where: [EventWhereUniqueInput!]!): [Event]
+  createEventStage(data: EventStageCreateInput!): EventStage
+  createEventStages(data: [EventStageCreateInput!]!): [EventStage]
+  updateEventStage(where: EventStageWhereUniqueInput!, data: EventStageUpdateInput!): EventStage
+  updateEventStages(data: [EventStageUpdateArgs!]!): [EventStage]
+  deleteEventStage(where: EventStageWhereUniqueInput!): EventStage
+  deleteEventStages(where: [EventStageWhereUniqueInput!]!): [EventStage]
+  createGuestAttendance(data: GuestAttendanceCreateInput!): GuestAttendance
+  createGuestAttendances(data: [GuestAttendanceCreateInput!]!): [GuestAttendance]
+  updateGuestAttendance(where: GuestAttendanceWhereUniqueInput!, data: GuestAttendanceUpdateInput!): GuestAttendance
+  updateGuestAttendances(data: [GuestAttendanceUpdateArgs!]!): [GuestAttendance]
+  deleteGuestAttendance(where: GuestAttendanceWhereUniqueInput!): GuestAttendance
+  deleteGuestAttendances(where: [GuestAttendanceWhereUniqueInput!]!): [GuestAttendance]
+  createGuest(data: GuestCreateInput!): Guest
+  createGuests(data: [GuestCreateInput!]!): [Guest]
+  updateGuest(where: GuestWhereUniqueInput!, data: GuestUpdateInput!): Guest
+  updateGuests(data: [GuestUpdateArgs!]!): [Guest]
+  deleteGuest(where: GuestWhereUniqueInput!): Guest
+  deleteGuests(where: [GuestWhereUniqueInput!]!): [Guest]
+  createInvitation(data: InvitationCreateInput!): Invitation
+  createInvitations(data: [InvitationCreateInput!]!): [Invitation]
+  updateInvitation(where: InvitationWhereUniqueInput!, data: InvitationUpdateInput!): Invitation
+  updateInvitations(data: [InvitationUpdateArgs!]!): [Invitation]
+  deleteInvitation(where: InvitationWhereUniqueInput!): Invitation
+  deleteInvitations(where: [InvitationWhereUniqueInput!]!): [Invitation]
+  createSubscription(data: SubscriptionCreateInput!): Subscription
+  createSubscriptions(data: [SubscriptionCreateInput!]!): [Subscription]
+  updateSubscription(where: SubscriptionWhereUniqueInput!, data: SubscriptionUpdateInput!): Subscription
+  updateSubscriptions(data: [SubscriptionUpdateArgs!]!): [Subscription]
+  deleteSubscription(where: SubscriptionWhereUniqueInput!): Subscription
+  deleteSubscriptions(where: [SubscriptionWhereUniqueInput!]!): [Subscription]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -686,6 +1268,21 @@ type Query {
   events(where: EventWhereInput! = {}, orderBy: [EventOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventWhereUniqueInput): [Event!]
   event(where: EventWhereUniqueInput!): Event
   eventsCount(where: EventWhereInput! = {}): Int
+  eventStages(where: EventStageWhereInput! = {}, orderBy: [EventStageOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: EventStageWhereUniqueInput): [EventStage!]
+  eventStage(where: EventStageWhereUniqueInput!): EventStage
+  eventStagesCount(where: EventStageWhereInput! = {}): Int
+  guestAttendances(where: GuestAttendanceWhereInput! = {}, orderBy: [GuestAttendanceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: GuestAttendanceWhereUniqueInput): [GuestAttendance!]
+  guestAttendance(where: GuestAttendanceWhereUniqueInput!): GuestAttendance
+  guestAttendancesCount(where: GuestAttendanceWhereInput! = {}): Int
+  guests(where: GuestWhereInput! = {}, orderBy: [GuestOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: GuestWhereUniqueInput): [Guest!]
+  guest(where: GuestWhereUniqueInput!): Guest
+  guestsCount(where: GuestWhereInput! = {}): Int
+  invitations(where: InvitationWhereInput! = {}, orderBy: [InvitationOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: InvitationWhereUniqueInput): [Invitation!]
+  invitation(where: InvitationWhereUniqueInput!): Invitation
+  invitationsCount(where: InvitationWhereInput! = {}): Int
+  subscriptions(where: SubscriptionWhereInput! = {}, orderBy: [SubscriptionOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SubscriptionWhereUniqueInput): [Subscription!]
+  subscription(where: SubscriptionWhereUniqueInput!): Subscription
+  subscriptionsCount(where: SubscriptionWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

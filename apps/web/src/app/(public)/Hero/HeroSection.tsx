@@ -51,10 +51,10 @@ function HeroSection() {
               loop: true
             }}>
             <CarouselContent
-              className="max-h-[771px] h-full"
+              className="w-full h-full"
             >
               {[hero, hero3, hero2].map((img, index) => (
-                <CarouselItem key={index} className="h-[771px]">
+                <CarouselItem key={index} className="h-[60vh]">
                   <Image
                     width={1024}
                     height={1024}

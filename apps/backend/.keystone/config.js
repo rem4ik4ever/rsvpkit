@@ -33,7 +33,8 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core7 = require("@keystone-6/core");
+var import_config2 = require("dotenv/config");
+var import_core12 = require("@keystone-6/core");
 
 // schema/session.ts
 var import_core = require("@keystone-6/core");
@@ -137,7 +138,7 @@ var sendEmail = async (params) => {
 };
 
 // bullmq/jobs/send-welcome-email.ts
-var sendWelcomeEmailJob = async ({ userId }) => {
+var sendWelcomeEmailJob = async (context, { userId }) => {
   console.log("Sending welcome email to user", userId);
   await sendEmail({
     to: "rem@rsvpkit.co",
@@ -150,22 +151,167 @@ var sendWelcomeEmailJob = async ({ userId }) => {
   });
 };
 
+// lib/stripe.ts
+var import_stripe = __toESM(require("stripe"));
+var stripe = new import_stripe.default(process.env.STRIPE_SECRET_KEY ?? "", {
+  apiVersion: "2024-06-20",
+  typescript: true
+});
+var createStripeCustomer = async (context, userId) => {
+  const user = await context.sudo().db.User.findOne({
+    where: {
+      id: userId
+    }
+  });
+  if (!user)
+    throw new Error("Can't create Stripe customer. User not found");
+  const customer = await stripe.customers.create({
+    email: user.email,
+    name: user.name,
+    metadata: {
+      userId: user.id,
+      orgId: user.currentTeamId
+    }
+  });
+  const stripeSubscription = await stripe.subscriptions.create({
+    customer: customer.id,
+    items: [
+      {
+        price: process.env.FREE_PLAN_PRICE_ID
+      }
+    ]
+  });
+  const subscription = await context.sudo().db.Subscription.createOne({
+    data: {
+      user: {
+        connect: {
+          id: user.id
+        }
+      },
+      team: {
+        connect: {
+          id: user.currentTeamId
+        }
+      },
+      stripeCustomerId: customer.id,
+      stripeSubscriptionId: stripeSubscription.id,
+      stripePriceId: stripeSubscription.items.data[0]?.price.id ?? process.env.FREE_PLAN_PRICE_ID
+    }
+  });
+  return {
+    customer,
+    stripeSubscription,
+    subscription
+  };
+};
+
+// bullmq/jobs/create-stripe-customer-with-subscription.ts
+var createStripeCustomerWithSubscription = async (context, { userId }) => {
+  return createStripeCustomer(context, userId);
+};
+
 // bullmq/workers.ts
+var import_context = require("@keystone-6/core/context");
+var PrismaModule = __toESM(require(".prisma/client"));
 var jobs = {
-  "send-welcome-email": sendWelcomeEmailJob
+  "send-welcome-email": sendWelcomeEmailJob,
+  "create-stripe-customer-with-subscription": createStripeCustomerWithSubscription
 };
 var initializeWorkers = () => {
   console.log("Initializing workers");
   const worker = new import_bullmq3.Worker(QUEUES.default, async (job) => {
     console.log(job.name, job.data);
     const jobToPerform = jobs[job.name];
+    const context = (0, import_context.getContext)(keystone_default, PrismaModule);
     if (!jobToPerform) {
       throw new Error(`Job not found: ${job.name}`);
     }
-    await jobToPerform(job.data);
+    return await jobToPerform(context, job.data);
   }, {
     connection: redis
   });
+};
+
+// services/team.service.ts
+var teamService = (ctx) => {
+  const addTeamMember = async ({ userId, role, teamId }) => {
+    if (await teamMemberExists({ userId, teamId })) {
+      throw new Error("User is already a member of the team");
+    }
+    return ctx.prisma.teamMember.create({
+      data: {
+        user: { connect: { id: userId } },
+        team: { connect: { id: teamId } },
+        role
+      }
+    });
+  };
+  const teamMemberExists = async ({ userId, teamId }) => {
+    return ctx.prisma.teamMember.findFirst({
+      where: {
+        user: {
+          id: {
+            equals: userId
+          }
+        },
+        team: {
+          id: {
+            equals: teamId
+          }
+        }
+      }
+    });
+  };
+  const isTeamOwner = async ({ userId, teamId }) => {
+    const teamMember = await ctx.prisma.teamMember.findFirst({
+      where: {
+        user: {
+          id: {
+            equals: userId
+          }
+        },
+        team: {
+          id: {
+            equals: teamId
+          }
+        }
+      }
+    });
+    return teamMember?.role === "owner";
+  };
+  const createDefaultTeam = async ({ userId }) => {
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    });
+    if (!user)
+      throw new Error("Can't create default team. User not found");
+    const team = await ctx.prisma.team.create({
+      data: {
+        name: `${user.name}'s Team`
+      }
+    });
+    const teamOwner = await addTeamMember({ userId, teamId: team.id, role: "owner" });
+    await ctx.prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        currentTeamId: team.id
+      }
+    });
+    return {
+      team,
+      teamOwner
+    };
+  };
+  return {
+    addTeamMember,
+    teamMemberExists,
+    isTeamOwner,
+    createDefaultTeam
+  };
 };
 
 // schema/user.ts
@@ -176,9 +322,11 @@ var UserSchema = (0, import_core2.list)({
   //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
   access: import_access2.allowAll,
   hooks: {
-    afterOperation: async ({ operation, item }) => {
+    afterOperation: async ({ operation, item, context }) => {
       if (operation === "create") {
+        await teamService(context).createDefaultTeam({ userId: item.id.toString() });
         defaultQueue.add("send-welcome-email", { userId: item.id });
+        defaultQueue.add("create-stripe-customer-with-subscription", { userId: item.id });
       }
     }
   },
@@ -187,6 +335,8 @@ var UserSchema = (0, import_core2.list)({
     // by adding isRequired, we enforce that every User should have a name
     //   if no name is provided, an error will be displayed
     name: (0, import_fields2.text)({ validation: { isRequired: true } }),
+    firstName: (0, import_fields2.text)(),
+    lastName: (0, import_fields2.text)(),
     email: (0, import_fields2.text)({
       validation: { isRequired: true },
       // by adding isIndexed: 'unique', we're saying that no user can have the same
@@ -199,6 +349,7 @@ var UserSchema = (0, import_core2.list)({
     teamMember: (0, import_fields2.relationship)({ ref: "TeamMember.user", many: true }),
     currentTeam: (0, import_fields2.relationship)({ ref: "Team", many: false }),
     events: (0, import_fields2.relationship)({ ref: "Event.createdBy", many: true }),
+    subscriptions: (0, import_fields2.relationship)({ ref: "Subscription.user", many: true }),
     emailConfirmedAt: (0, import_fields2.timestamp)(),
     avatarUrl: (0, import_fields2.text)(),
     createdAt: (0, import_fields2.timestamp)({
@@ -261,6 +412,7 @@ var TeamSchema = (0, import_core4.list)({
     description: (0, import_fields4.text)(),
     members: (0, import_fields4.relationship)({ ref: "TeamMember.team", many: true }),
     events: (0, import_fields4.relationship)({ ref: "Event.team", many: true }),
+    subscription: (0, import_fields4.relationship)({ ref: "Subscription.team", many: false }),
     createdAt: (0, import_fields4.timestamp)({
       defaultValue: { kind: "now" }
     })
@@ -295,23 +447,37 @@ var import_access6 = require("@keystone-6/core/access");
 var import_fields6 = require("@keystone-6/core/fields");
 var EventSchema = (0, import_core6.list)({
   access: import_access6.allowAll,
+  hooks: {
+    resolveInput: async ({ resolvedData, operation, context }) => {
+      if (operation === "create") {
+        resolvedData.createdBy = { connect: { id: context.session.itemId } };
+        if (!context.session.data.currentTeamId)
+          throw new Error("missing_team");
+        resolvedData.teamId = { connect: { id: context.session.data.currentTeamId } };
+        return resolvedData;
+      }
+    }
+  },
   fields: {
     name: (0, import_fields6.text)({ validation: { isRequired: true } }),
-    starts_at: (0, import_fields6.text)({ validation: { isRequired: true } }),
-    ends_at: (0, import_fields6.text)({ validation: { isRequired: true } }),
+    startsAt: (0, import_fields6.timestamp)({ validation: { isRequired: true } }),
+    endsAt: (0, import_fields6.timestamp)({ validation: { isRequired: true } }),
     type: (0, import_fields6.select)({
       options: [
-        "wedding",
-        "birthday",
-        "conference",
-        "meetup",
-        "party"
-      ]
+        { label: "Wedding", value: "wedding" },
+        { label: "Birthday", value: "birthday" },
+        { label: "Conference", value: "conference" },
+        { label: "Meetup", value: "meetup" },
+        { label: "Party", value: "party" }
+      ],
+      ui: {
+        displayMode: "select"
+      }
     }),
-    location: (0, import_fields6.text)(),
+    location: (0, import_fields6.json)(),
     createdBy: (0, import_fields6.relationship)({ ref: "User.events", many: false }),
     team: (0, import_fields6.relationship)({ ref: "Team.events", many: false }),
-    published_at: (0, import_fields6.timestamp)(),
+    publishedAt: (0, import_fields6.timestamp)(),
     createdAt: (0, import_fields6.timestamp)({
       defaultValue: { kind: "now" }
     }),
@@ -319,7 +485,138 @@ var EventSchema = (0, import_core6.list)({
       db: {
         updatedAt: true
       }
+    }),
+    plusOneAllowed: (0, import_fields6.checkbox)({ defaultValue: false }),
+    capacity: (0, import_fields6.integer)(),
+    stages: (0, import_fields6.relationship)({ ref: "EventStage.event", many: true }),
+    invitations: (0, import_fields6.relationship)({ ref: "Invitation.event", many: true })
+  }
+});
+
+// schema/event-stage.ts
+var import_core7 = require("@keystone-6/core");
+var import_access7 = require("@keystone-6/core/access");
+var import_fields7 = require("@keystone-6/core/fields");
+var EventStageSchema = (0, import_core7.list)({
+  access: import_access7.allowAll,
+  fields: {
+    name: (0, import_fields7.text)({ validation: { isRequired: true } }),
+    event: (0, import_fields7.relationship)({ ref: "Event.stages", many: false }),
+    location: (0, import_fields7.json)(),
+    stageDate: (0, import_fields7.timestamp)({ validation: { isRequired: true } }),
+    startTime: (0, import_fields7.text)({ validation: { isRequired: true } }),
+    endTime: (0, import_fields7.text)({ validation: { isRequired: true } }),
+    description: (0, import_fields7.text)(),
+    capacity: (0, import_fields7.integer)(),
+    createdAt: (0, import_fields7.timestamp)({
+      defaultValue: { kind: "now" }
+    }),
+    updatedAt: (0, import_fields7.timestamp)({
+      db: {
+        updatedAt: true
+      }
+    }),
+    attendance: (0, import_fields7.relationship)({ ref: "GuestAttendance.stage", many: true })
+  }
+});
+
+// schema/guest-attendance.ts
+var import_core8 = require("@keystone-6/core");
+var import_access8 = require("@keystone-6/core/access");
+var import_fields8 = require("@keystone-6/core/fields");
+var GuestAttendanceSchema = (0, import_core8.list)({
+  access: import_access8.allowAll,
+  fields: {
+    invitation: (0, import_fields8.relationship)({ ref: "Invitation.attendance", many: false }),
+    stage: (0, import_fields8.relationship)({ ref: "EventStage.attendance", many: false }),
+    attending: (0, import_fields8.checkbox)({ defaultValue: false }),
+    createdAt: (0, import_fields8.timestamp)({
+      defaultValue: { kind: "now" }
+    }),
+    updatedAt: (0, import_fields8.timestamp)({
+      db: {
+        updatedAt: true
+      }
     })
+  }
+});
+
+// schema/guest.ts
+var import_core9 = require("@keystone-6/core");
+var import_access9 = require("@keystone-6/core/access");
+var import_fields9 = require("@keystone-6/core/fields");
+var GuestSchema = (0, import_core9.list)({
+  access: import_access9.allowAll,
+  fields: {
+    firstName: (0, import_fields9.text)({ validation: { isRequired: true } }),
+    lastName: (0, import_fields9.text)({ validation: { isRequired: true } }),
+    email: (0, import_fields9.text)({ validation: { isRequired: true } }),
+    phone: (0, import_fields9.text)(),
+    address: (0, import_fields9.text)(),
+    city: (0, import_fields9.text)(),
+    state: (0, import_fields9.text)(),
+    zipCode: (0, import_fields9.text)(),
+    country: (0, import_fields9.text)(),
+    invitations: (0, import_fields9.relationship)({ ref: "Invitation.guest", many: true }),
+    createdAt: (0, import_fields9.timestamp)({
+      defaultValue: { kind: "now" }
+    }),
+    updatedAt: (0, import_fields9.timestamp)({
+      db: {
+        updatedAt: true
+      }
+    })
+  }
+});
+
+// schema/invitation.ts
+var import_core10 = require("@keystone-6/core");
+var import_access10 = require("@keystone-6/core/access");
+var import_fields10 = require("@keystone-6/core/fields");
+var InvitationSchema = (0, import_core10.list)({
+  access: import_access10.allowAll,
+  fields: {
+    event: (0, import_fields10.relationship)({ ref: "Event.invitations", many: false }),
+    guest: (0, import_fields10.relationship)({ ref: "Guest.invitations", many: false }),
+    sentDate: (0, import_fields10.timestamp)(),
+    response: (0, import_fields10.select)({
+      options: [
+        { label: "Accepted", value: "accepted" },
+        { label: "Declined", value: "declined" },
+        { label: "Pending", value: "pending" }
+      ],
+      ui: {
+        displayMode: "segmented-control"
+      }
+    }),
+    plusOneName: (0, import_fields10.text)(),
+    plusOneAllowed: (0, import_fields10.checkbox)({ defaultValue: false }),
+    notes: (0, import_fields10.text)(),
+    attendance: (0, import_fields10.relationship)({ ref: "GuestAttendance.invitation", many: true }),
+    createdAt: (0, import_fields10.timestamp)({
+      defaultValue: { kind: "now" }
+    }),
+    updatedAt: (0, import_fields10.timestamp)({
+      db: {
+        updatedAt: true
+      }
+    })
+  }
+});
+
+// schema/subscription.ts
+var import_core11 = require("@keystone-6/core");
+var import_access11 = require("@keystone-6/core/access");
+var import_fields11 = require("@keystone-6/core/fields");
+var SubscriptionSchema = (0, import_core11.list)({
+  access: import_access11.allowAll,
+  fields: {
+    stripeCustomerId: (0, import_fields11.text)(),
+    stripeSubscriptionId: (0, import_fields11.text)(),
+    stripePriceId: (0, import_fields11.text)(),
+    stripeCurrentPeriodEnd: (0, import_fields11.timestamp)(),
+    user: (0, import_fields11.relationship)({ ref: "User.subscriptions", many: false }),
+    team: (0, import_fields11.relationship)({ ref: "Team.subscription", many: false })
   }
 });
 
@@ -330,7 +627,12 @@ var lists = {
   TeamMember: TeamMemberSchema,
   Team: TeamSchema,
   Account: AccountSchema,
-  Event: EventSchema
+  Event: EventSchema,
+  EventStage: EventStageSchema,
+  GuestAttendance: GuestAttendanceSchema,
+  Guest: GuestSchema,
+  Invitation: InvitationSchema,
+  Subscription: SubscriptionSchema
 };
 
 // auth.ts
@@ -426,6 +728,7 @@ function jwtSessionStrategy({
           data: {
             isAdmin: who.isAdmin,
             name: who.name,
+            currentTeamId: who.currentTeamId,
             id: who.id
           }
         };
@@ -575,6 +878,7 @@ var createGoogleRouter = (commonContext) => {
             data: {
               isAdmin: false,
               name: exists.name,
+              currentTeamId: exists.currentTeamId,
               id: exists.id
             }
           }
@@ -584,23 +888,25 @@ var createGoogleRouter = (commonContext) => {
       const user = await context.db.User.createOne({
         data: {
           email: profile?.email,
+          firstName: profile?.given_name,
+          lastName: profile?.family_name,
           emailConfirmedAt: /* @__PURE__ */ new Date(),
           name: profile?.name,
           avatarUrl: profile?.picture,
-          password: (0, import_uuid2.v4)(),
-          accounts: {
-            create: [{
-              provider: "google",
-              type: "oauth",
-              providerAccountId: profile?.sub,
-              refresh_token: tokens.refresh_token,
-              access_token: tokens.access_token,
-              expires_at: tokens.expiry_date ? new Date(tokens.expiry_date * 1e3) : void 0,
-              token_type: tokens.token_type,
-              scope: tokens.scope,
-              id_token: tokens.id_token
-            }]
-          }
+          password: (0, import_uuid2.v4)()
+        }
+      });
+      const account = await context.prisma.account.create({
+        data: {
+          provider: "google",
+          type: "oauth",
+          providerAccountId: profile?.sub,
+          refresh_token: tokens.refresh_token,
+          access_token: tokens.access_token,
+          expires_at: tokens.expiry_date ? new Date(tokens.expiry_date * 1e3) : void 0,
+          token_type: tokens.token_type,
+          scope: tokens.scope,
+          id_token: tokens.id_token
         }
       });
       const token = await session.start({
@@ -611,6 +917,7 @@ var createGoogleRouter = (commonContext) => {
           data: {
             isAdmin: false,
             name: user.name,
+            currentTeamId: user.currentTeamId,
             id: user.id
           }
         }
@@ -621,13 +928,14 @@ var createGoogleRouter = (commonContext) => {
         res.redirect(`${process.env.CLIENT_URL}/login?token=${token}`);
       }
     } catch (error) {
+      console.log({ error });
       next(error);
     }
   });
   return router;
 };
 
-// express/logger.ts
+// lib/logger.ts
 var import_winston = __toESM(require("winston"));
 var logger = import_winston.default.createLogger({
   level: "error",
@@ -638,6 +946,42 @@ var logger = import_winston.default.createLogger({
   ]
 });
 
+// services/stripe.ts
+var import_express2 = require("express");
+var import_body_parser = __toESM(require("body-parser"));
+var createStripeRouter = (commonContext) => {
+  const router = (0, import_express2.Router)();
+  router.post("/", import_body_parser.default.raw({ type: "application/json" }), async (req, res) => {
+    try {
+      const body = req.body;
+      const signature = req.headers["stripe-signature"] ?? "";
+      let event;
+      try {
+        event = stripe.webhooks.constructEvent(
+          body,
+          signature,
+          process.env.STRIPE_WEBHOOK_SECRET ?? ""
+        );
+      } catch (err) {
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+      }
+      console.log({
+        type: event.type,
+        data: event.data.object
+      });
+      const session2 = event.data.object;
+      if (event.type === "checkout.session.completed") {
+      }
+      if (event.type === "invoice.payment_succeeded") {
+      }
+      return res.status(200).send("OK");
+    } catch (err) {
+      logger.error("Stripe Webhook error", { metadata: err });
+    }
+  });
+  return router;
+};
+
 // express/server.ts
 var errorHandler = (err, req, res, next) => {
   logger.error(err.message, { metadata: err.stack });
@@ -645,13 +989,14 @@ var errorHandler = (err, req, res, next) => {
 };
 var extendExpressApp = (app, commonContext) => {
   app.use("/api/oauth/google", createGoogleRouter(commonContext));
+  app.use("/api/webhooks/stripe", createStripeRouter(commonContext));
   app.use(errorHandler);
 };
 
 // keystone.ts
 var allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 var keystone_default = withAuth(
-  (0, import_core7.config)({
+  (0, import_core12.config)({
     server: {
       port: parseInt(process.env.PORT, 10) || 3300,
       cors: {
@@ -680,7 +1025,6 @@ var keystone_default = withAuth(
     session,
     ui: {
       isAccessAllowed: (context) => {
-        console.log({ session: context.session });
         return !!context.session?.data?.isAdmin;
       }
     }

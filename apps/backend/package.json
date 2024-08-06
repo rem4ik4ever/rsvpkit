@@ -8,7 +8,8 @@
     "studio": "keystone prisma studio",
     "test": "jest",
     "test:watch": "jest --watch",
-    "postinstall": "keystone build --no-ui --frozen"
+    "postinstall": "keystone build --no-ui --frozen",
+    "stripe:listen": "stripe listen --forward-to localhost:3300/api/webhooks/stripe"
   },
   "dependencies": {
     "@keystone-6/auth": "^7.0.0",
@@ -24,6 +25,7 @@
     "ioredis": "^5.4.1",
     "nodemailer": "^6.9.14",
     "react": "^18.3.1",
+    "stripe": "^16.5.0",
     "typescript": "^4.9.5",
     "ua-parser-js": "^1.0.38",
     "uuid": "^10.0.0",

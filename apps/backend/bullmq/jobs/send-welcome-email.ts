@@ -1,5 +1,7 @@
 import { sendEmail } from '../../email'
-export const sendWelcomeEmailJob = async ({ userId }: { userId: string }) => {
+import { Context } from '.keystone/types'
+
+export const sendWelcomeEmailJob = async (context: Context, { userId }: { userId: string }) => {
   console.log('Sending welcome email to user', userId);
   await sendEmail({
     to: "rem@rsvpkit.co",

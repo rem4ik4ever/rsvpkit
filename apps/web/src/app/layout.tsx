@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthStoreProvider } from "@/stores/auth";
+import { UrqlClientProvider } from "@/urql";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,9 +20,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthStoreProvider>
-          {children}
+          <UrqlClientProvider>
+            {children}
+          </UrqlClientProvider>
         </AuthStoreProvider>
       </body>
-    </html>
+    </html >
   );
 }

@@ -2,6 +2,7 @@ import { list } from "@keystone-6/core";
 import { allowAll } from "@keystone-6/core/access";
 import { checkbox, image, password, relationship, text, timestamp } from "@keystone-6/core/fields";
 import { defaultQueue } from '../bullmq'
+import { teamService } from "../services/team.service";
 
 export const UserSchema = list({
   // WARNING
@@ -10,9 +11,12 @@ export const UserSchema = list({
   //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
   access: allowAll,
   hooks: {
-    afterOperation: async ({ operation, item }) => {
+    afterOperation: async ({ operation, item, context }) => {
       if (operation === 'create') {
+
+        await teamService(context as any).createDefaultTeam({ userId: item.id.toString() })
         defaultQueue.add('send-welcome-email', { userId: item.id })
+        defaultQueue.add('create-stripe-customer-with-subscription', { userId: item.id })
       }
     }
   },
@@ -22,6 +26,8 @@ export const UserSchema = list({
     // by adding isRequired, we enforce that every User should have a name
     //   if no name is provided, an error will be displayed
     name: text({ validation: { isRequired: true } }),
+    firstName: text(),
+    lastName: text(),
 
     email: text({
       validation: { isRequired: true },
@@ -41,6 +47,8 @@ export const UserSchema = list({
     currentTeam: relationship({ ref: 'Team', many: false }),
 
     events: relationship({ ref: 'Event.createdBy', many: true }),
+
+    subscriptions: relationship({ ref: 'Subscription.user', many: true }),
 
     emailConfirmedAt: timestamp(),
 

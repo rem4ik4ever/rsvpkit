@@ -3,6 +3,7 @@ import { google } from 'googleapis'
 import { Router } from 'express'
 import { session } from '../auth'
 import { v4 } from 'uuid'
+import { teamService } from './team.service'
 
 const googleAuthClient = new google.auth.OAuth2({
   clientId: process.env.GOOGLE_CLIENT_ID,
@@ -50,6 +51,7 @@ export const createGoogleRouter = (commonContext: Context) => {
         }
       });
       if (exists) {
+        //@todo check if team exists
         const token = await session.start({
           context,
           data: {
@@ -58,6 +60,7 @@ export const createGoogleRouter = (commonContext: Context) => {
             data: {
               isAdmin: false,
               name: exists.name,
+              currentTeamId: exists.currentTeamId!,
               id: exists.id
             }
           }
@@ -67,23 +70,25 @@ export const createGoogleRouter = (commonContext: Context) => {
       const user = await context.db.User.createOne({
         data: {
           email: profile?.email,
+          firstName: profile?.given_name,
+          lastName: profile?.family_name,
           emailConfirmedAt: new Date(),
           name: profile?.name,
           avatarUrl: profile?.picture,
           password: v4(),
-          accounts: {
-            create: [{
-              provider: 'google',
-              type: 'oauth',
-              providerAccountId: profile?.sub,
-              refresh_token: tokens.refresh_token,
-              access_token: tokens.access_token,
-              expires_at: tokens.expiry_date ? new Date(tokens.expiry_date * 1000) : undefined,
-              token_type: tokens.token_type,
-              scope: tokens.scope,
-              id_token: tokens.id_token,
-            }]
-          }
+        }
+      })
+      const account = await context.prisma.account.create({
+        data: {
+          provider: 'google',
+          type: 'oauth',
+          providerAccountId: profile?.sub,
+          refresh_token: tokens.refresh_token!,
+          access_token: tokens.access_token!,
+          expires_at: tokens.expiry_date ? new Date(tokens.expiry_date * 1000) : undefined,
+          token_type: tokens.token_type!,
+          scope: tokens.scope,
+          id_token: tokens.id_token!,
         }
       })
       const token = await session.start({
@@ -94,6 +99,7 @@ export const createGoogleRouter = (commonContext: Context) => {
           data: {
             isAdmin: false,
             name: user.name,
+            currentTeamId: user.currentTeamId!,
             id: user.id
           }
         }
@@ -105,6 +111,7 @@ export const createGoogleRouter = (commonContext: Context) => {
         res.redirect(`${process.env.CLIENT_URL}/login?token=${token}`);
       }
     } catch (error) {
+      console.log({ error })
       next(error);
     }
   })

@@ -43,7 +43,7 @@ export function LoginForm() {
     const token = qs.get('token')
     if (token) {
       localStorage.setItem('token', token)
-      router.replace('/app')
+      location.href = '/app'
     }
   }, [qs, router])
   const form = useForm({

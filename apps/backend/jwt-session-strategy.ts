@@ -62,6 +62,7 @@ interface Session {
   data: {
     isAdmin: boolean
     name: string
+    currentTeamId: string
     id: string
   }
 }
@@ -107,6 +108,7 @@ export function jwtSessionStrategy({
           data: {
             isAdmin: who.isAdmin,
             name: who.name,
+            currentTeamId: who.currentTeamId,
             id: who.id,
           }
         }

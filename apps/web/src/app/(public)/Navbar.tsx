@@ -7,6 +7,9 @@ import { BsDiscord } from "react-icons/bs";
 import { FaTwitter } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
+import Link from "next/link";
+import { useLogoutMutation } from "@/hooks/gql";
 
 // MenuItems JSON
 const menuItems = [
@@ -83,7 +86,6 @@ function MobileMenu({ onClose }) {
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const handleMobileMenuToggle = (event) => {
     event.stopPropagation();
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -119,7 +121,9 @@ function Navbar() {
         <div className="flex items-center justify-between">
           <button>
             <div className="header-logo flex items-center space-x-2">
-              <h2 className="text-black font-bold text-2xl">RSVPkit</h2>
+              <h2 className="text-black font-bold text-2xl">
+                <Logo />
+              </h2>
             </div>
           </button>
           <div className="header-menu hidden lg:block">
@@ -135,9 +139,11 @@ function Navbar() {
           </div>
           <div className="header-button space-x-2">
             <div className="hidden lg:flex lg:items-center">
-              <Button size="lg">
-                Join now
-              </Button>
+              <Link href="/app">
+                <Button size="lg">
+                  Join now
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="flex items-center justify-center lg:hidden">

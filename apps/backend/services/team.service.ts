@@ -51,9 +51,41 @@ export const teamService = (ctx: Context) => {
     return teamMember?.role === 'owner'
   }
 
+  const createDefaultTeam = async ({ userId }: { userId: string }) => {
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        id: userId
+      }
+    })
+    if (!user) throw new Error("Can't create default team. User not found")
+
+    const team = await ctx.prisma.team.create({
+      data: {
+        name: `${user.name}'s Team`,
+      }
+    })
+
+    const teamOwner = await addTeamMember({ userId, teamId: team.id, role: 'owner' })
+
+    await ctx.prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        currentTeamId: team.id
+      }
+    })
+
+    return {
+      team,
+      teamOwner
+    };
+  }
+
   return {
     addTeamMember,
     teamMemberExists,
-    isTeamOwner
+    isTeamOwner,
+    createDefaultTeam
   }
 }

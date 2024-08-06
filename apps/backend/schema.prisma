@@ -26,20 +26,23 @@ model Session {
 }
 
 model User {
-  id               String       @id @default(cuid())
-  name             String       @default("")
-  email            String       @unique @default("")
+  id               String         @id @default(cuid())
+  name             String         @default("")
+  firstName        String         @default("")
+  lastName         String         @default("")
+  email            String         @unique @default("")
   password         String
-  sessions         Session[]    @relation("Session_user")
-  accounts         Account[]    @relation("Account_user")
-  teamMember       TeamMember[] @relation("TeamMember_user")
-  currentTeam      Team?        @relation("User_currentTeam", fields: [currentTeamId], references: [id])
-  currentTeamId    String?      @map("currentTeam")
-  events           Event[]      @relation("Event_createdBy")
+  sessions         Session[]      @relation("Session_user")
+  accounts         Account[]      @relation("Account_user")
+  teamMember       TeamMember[]   @relation("TeamMember_user")
+  currentTeam      Team?          @relation("User_currentTeam", fields: [currentTeamId], references: [id])
+  currentTeamId    String?        @map("currentTeam")
+  events           Event[]        @relation("Event_createdBy")
+  subscriptions    Subscription[] @relation("Subscription_user")
   emailConfirmedAt DateTime?
-  avatarUrl        String       @default("")
-  createdAt        DateTime?    @default(now())
-  isAdmin          Boolean      @default(false)
+  avatarUrl        String         @default("")
+  createdAt        DateTime?      @default(now())
+  isAdmin          Boolean        @default(false)
 
   @@index([currentTeamId])
 }
@@ -60,13 +63,14 @@ model TeamMember {
 }
 
 model Team {
-  id                    String       @id @default(cuid())
-  name                  String       @default("")
-  description           String       @default("")
-  members               TeamMember[] @relation("TeamMember_team")
-  events                Event[]      @relation("Event_team")
-  createdAt             DateTime?    @default(now())
-  from_User_currentTeam User[]       @relation("User_currentTeam")
+  id                    String        @id @default(cuid())
+  name                  String        @default("")
+  description           String        @default("")
+  members               TeamMember[]  @relation("TeamMember_team")
+  events                Event[]       @relation("Event_team")
+  subscription          Subscription? @relation("Subscription_team")
+  createdAt             DateTime?     @default(now())
+  from_User_currentTeam User[]        @relation("User_currentTeam")
 }
 
 model Account {
@@ -89,19 +93,105 @@ model Account {
 }
 
 model Event {
-  id           String    @id @default(cuid())
-  name         String    @default("")
-  starts_at    String    @default("")
-  type         String?
-  location     String    @default("")
-  createdBy    User?     @relation("Event_createdBy", fields: [createdById], references: [id])
-  createdById  String?   @map("createdBy")
-  team         Team?     @relation("Event_team", fields: [teamId], references: [id])
-  teamId       String?   @map("team")
-  published_at DateTime?
-  createdAt    DateTime? @default(now())
-  updatedAt    DateTime? @updatedAt
+  id             String       @id @default(cuid())
+  name           String       @default("")
+  startsAt       DateTime
+  endsAt         DateTime
+  type           String?
+  location       String?
+  createdBy      User?        @relation("Event_createdBy", fields: [createdById], references: [id])
+  createdById    String?      @map("createdBy")
+  team           Team?        @relation("Event_team", fields: [teamId], references: [id])
+  teamId         String?      @map("team")
+  publishedAt    DateTime?
+  createdAt      DateTime?    @default(now())
+  updatedAt      DateTime?    @updatedAt
+  plusOneAllowed Boolean      @default(false)
+  capacity       Int?
+  stages         EventStage[] @relation("EventStage_event")
+  invitations    Invitation[] @relation("Invitation_event")
 
   @@index([createdById])
   @@index([teamId])
+}
+
+model EventStage {
+  id          String            @id @default(cuid())
+  name        String            @default("")
+  event       Event?            @relation("EventStage_event", fields: [eventId], references: [id])
+  eventId     String?           @map("event")
+  location    String?
+  stageDate   DateTime
+  startTime   String            @default("")
+  endTime     String            @default("")
+  description String            @default("")
+  capacity    Int?
+  createdAt   DateTime?         @default(now())
+  updatedAt   DateTime?         @updatedAt
+  attendance  GuestAttendance[] @relation("GuestAttendance_stage")
+
+  @@index([eventId])
+}
+
+model GuestAttendance {
+  id           String      @id @default(cuid())
+  invitation   Invitation? @relation("GuestAttendance_invitation", fields: [invitationId], references: [id])
+  invitationId String?     @map("invitation")
+  stage        EventStage? @relation("GuestAttendance_stage", fields: [stageId], references: [id])
+  stageId      String?     @map("stage")
+  attending    Boolean     @default(false)
+  createdAt    DateTime?   @default(now())
+  updatedAt    DateTime?   @updatedAt
+
+  @@index([invitationId])
+  @@index([stageId])
+}
+
+model Guest {
+  id          String       @id @default(cuid())
+  firstName   String       @default("")
+  lastName    String       @default("")
+  email       String       @default("")
+  phone       String       @default("")
+  address     String       @default("")
+  city        String       @default("")
+  state       String       @default("")
+  zipCode     String       @default("")
+  country     String       @default("")
+  invitations Invitation[] @relation("Invitation_guest")
+  createdAt   DateTime?    @default(now())
+  updatedAt   DateTime?    @updatedAt
+}
+
+model Invitation {
+  id             String            @id @default(cuid())
+  event          Event?            @relation("Invitation_event", fields: [eventId], references: [id])
+  eventId        String?           @map("event")
+  guest          Guest?            @relation("Invitation_guest", fields: [guestId], references: [id])
+  guestId        String?           @map("guest")
+  sentDate       DateTime?
+  response       String?
+  plusOneName    String            @default("")
+  plusOneAllowed Boolean           @default(false)
+  notes          String            @default("")
+  attendance     GuestAttendance[] @relation("GuestAttendance_invitation")
+  createdAt      DateTime?         @default(now())
+  updatedAt      DateTime?         @updatedAt
+
+  @@index([eventId])
+  @@index([guestId])
+}
+
+model Subscription {
+  id                     String    @id @default(cuid())
+  stripeCustomerId       String    @default("")
+  stripeSubscriptionId   String    @default("")
+  stripePriceId          String    @default("")
+  stripeCurrentPeriodEnd DateTime?
+  user                   User?     @relation("Subscription_user", fields: [userId], references: [id])
+  userId                 String?   @map("user")
+  team                   Team?     @relation("Subscription_team", fields: [teamId], references: [id])
+  teamId                 String?   @unique @map("team")
+
+  @@index([userId])
 }

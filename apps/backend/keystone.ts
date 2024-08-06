@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { Context } from '.keystone/types'
 // Welcome to Keystone!
 //
@@ -48,7 +49,6 @@ export default withAuth(
     session,
     ui: {
       isAccessAllowed: (context: Context) => {
-        console.log({ session: context.session })
         return !!context.session?.data?.isAdmin
       }
     },
