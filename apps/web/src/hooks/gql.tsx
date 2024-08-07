@@ -913,6 +913,8 @@ export type Mutation = {
   createInvitations?: Maybe<Array<Maybe<Invitation>>>;
   createSession?: Maybe<Session>;
   createSessions?: Maybe<Array<Maybe<Session>>>;
+  createSubscription?: Maybe<Subscription>;
+  createSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   createTeam?: Maybe<Team>;
   createTeamMember?: Maybe<TeamMember>;
   createTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -933,6 +935,8 @@ export type Mutation = {
   deleteInvitations?: Maybe<Array<Maybe<Invitation>>>;
   deleteSession?: Maybe<Session>;
   deleteSessions?: Maybe<Array<Maybe<Session>>>;
+  deleteSubscription?: Maybe<Subscription>;
+  deleteSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   deleteTeam?: Maybe<Team>;
   deleteTeamMember?: Maybe<TeamMember>;
   deleteTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -954,6 +958,8 @@ export type Mutation = {
   updateInvitations?: Maybe<Array<Maybe<Invitation>>>;
   updateSession?: Maybe<Session>;
   updateSessions?: Maybe<Array<Maybe<Session>>>;
+  updateSubscription?: Maybe<Subscription>;
+  updateSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   updateTeam?: Maybe<Team>;
   updateTeamMember?: Maybe<TeamMember>;
   updateTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -1041,6 +1047,16 @@ export type MutationCreateSessionArgs = {
 
 export type MutationCreateSessionsArgs = {
   data: Array<SessionCreateInput>;
+};
+
+
+export type MutationCreateSubscriptionArgs = {
+  data: SubscriptionCreateInput;
+};
+
+
+export type MutationCreateSubscriptionsArgs = {
+  data: Array<SubscriptionCreateInput>;
 };
 
 
@@ -1141,6 +1157,16 @@ export type MutationDeleteSessionArgs = {
 
 export type MutationDeleteSessionsArgs = {
   where: Array<SessionWhereUniqueInput>;
+};
+
+
+export type MutationDeleteSubscriptionArgs = {
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type MutationDeleteSubscriptionsArgs = {
+  where: Array<SubscriptionWhereUniqueInput>;
 };
 
 
@@ -1251,6 +1277,17 @@ export type MutationUpdateSessionsArgs = {
 };
 
 
+export type MutationUpdateSubscriptionArgs = {
+  data: SubscriptionUpdateInput;
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type MutationUpdateSubscriptionsArgs = {
+  data: Array<SubscriptionUpdateArgs>;
+};
+
+
 export type MutationUpdateTeamArgs = {
   data: TeamUpdateInput;
   where: TeamWhereUniqueInput;
@@ -1332,6 +1369,9 @@ export type Query = {
   session?: Maybe<Session>;
   sessions?: Maybe<Array<Session>>;
   sessionsCount?: Maybe<Scalars['Int']['output']>;
+  subscription?: Maybe<Subscription>;
+  subscriptions?: Maybe<Array<Subscription>>;
+  subscriptionsCount?: Maybe<Scalars['Int']['output']>;
   team?: Maybe<Team>;
   teamMember?: Maybe<TeamMember>;
   teamMembers?: Maybe<Array<TeamMember>>;
@@ -1474,6 +1514,25 @@ export type QuerySessionsArgs = {
 
 export type QuerySessionsCountArgs = {
   where?: SessionWhereInput;
+};
+
+
+export type QuerySubscriptionArgs = {
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type QuerySubscriptionsArgs = {
+  cursor?: InputMaybe<SubscriptionWhereUniqueInput>;
+  orderBy?: Array<SubscriptionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SubscriptionWhereInput;
+};
+
+
+export type QuerySubscriptionsCountArgs = {
+  where?: SubscriptionWhereInput;
 };
 
 
@@ -1650,6 +1709,94 @@ export type StringNullableFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  id: Scalars['ID']['output'];
+  stripeCurrentPeriodEnd?: Maybe<Scalars['DateTime']['output']>;
+  stripeCustomerId?: Maybe<Scalars['String']['output']>;
+  stripePriceId?: Maybe<Scalars['String']['output']>;
+  stripeSubscriptionId?: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Team>;
+  user?: Maybe<User>;
+};
+
+export type SubscriptionCreateInput = {
+  stripeCurrentPeriodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeCustomerId?: InputMaybe<Scalars['String']['input']>;
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  stripeSubscriptionId?: InputMaybe<Scalars['String']['input']>;
+  team?: InputMaybe<TeamRelateToOneForCreateInput>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type SubscriptionManyRelationFilter = {
+  every?: InputMaybe<SubscriptionWhereInput>;
+  none?: InputMaybe<SubscriptionWhereInput>;
+  some?: InputMaybe<SubscriptionWhereInput>;
+};
+
+export type SubscriptionOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  stripeCurrentPeriodEnd?: InputMaybe<OrderDirection>;
+  stripeCustomerId?: InputMaybe<OrderDirection>;
+  stripePriceId?: InputMaybe<OrderDirection>;
+  stripeSubscriptionId?: InputMaybe<OrderDirection>;
+};
+
+export type SubscriptionRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  create?: InputMaybe<Array<SubscriptionCreateInput>>;
+};
+
+export type SubscriptionRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  create?: InputMaybe<Array<SubscriptionCreateInput>>;
+  disconnect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  set?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+};
+
+export type SubscriptionRelateToOneForCreateInput = {
+  connect?: InputMaybe<SubscriptionWhereUniqueInput>;
+  create?: InputMaybe<SubscriptionCreateInput>;
+};
+
+export type SubscriptionRelateToOneForUpdateInput = {
+  connect?: InputMaybe<SubscriptionWhereUniqueInput>;
+  create?: InputMaybe<SubscriptionCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SubscriptionUpdateArgs = {
+  data: SubscriptionUpdateInput;
+  where: SubscriptionWhereUniqueInput;
+};
+
+export type SubscriptionUpdateInput = {
+  stripeCurrentPeriodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeCustomerId?: InputMaybe<Scalars['String']['input']>;
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  stripeSubscriptionId?: InputMaybe<Scalars['String']['input']>;
+  team?: InputMaybe<TeamRelateToOneForUpdateInput>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type SubscriptionWhereInput = {
+  AND?: InputMaybe<Array<SubscriptionWhereInput>>;
+  NOT?: InputMaybe<Array<SubscriptionWhereInput>>;
+  OR?: InputMaybe<Array<SubscriptionWhereInput>>;
+  id?: InputMaybe<IdFilter>;
+  stripeCurrentPeriodEnd?: InputMaybe<DateTimeNullableFilter>;
+  stripeCustomerId?: InputMaybe<StringFilter>;
+  stripePriceId?: InputMaybe<StringFilter>;
+  stripeSubscriptionId?: InputMaybe<StringFilter>;
+  team?: InputMaybe<TeamWhereInput>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type SubscriptionWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type Team = {
   __typename?: 'Team';
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -1660,6 +1807,7 @@ export type Team = {
   members?: Maybe<Array<TeamMember>>;
   membersCount?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  subscription?: Maybe<Subscription>;
 };
 
 
@@ -1696,6 +1844,7 @@ export type TeamCreateInput = {
   events?: InputMaybe<EventRelateToManyForCreateInput>;
   members?: InputMaybe<TeamMemberRelateToManyForCreateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<SubscriptionRelateToOneForCreateInput>;
 };
 
 export type TeamMember = {
@@ -1804,6 +1953,7 @@ export type TeamUpdateInput = {
   events?: InputMaybe<EventRelateToManyForUpdateInput>;
   members?: InputMaybe<TeamMemberRelateToManyForUpdateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<SubscriptionRelateToOneForUpdateInput>;
 };
 
 export type TeamWhereInput = {
@@ -1816,6 +1966,7 @@ export type TeamWhereInput = {
   id?: InputMaybe<IdFilter>;
   members?: InputMaybe<TeamMemberManyRelationFilter>;
   name?: InputMaybe<StringFilter>;
+  subscription?: InputMaybe<SubscriptionWhereInput>;
 };
 
 export type TeamWhereUniqueInput = {
@@ -1841,6 +1992,8 @@ export type User = {
   password?: Maybe<PasswordState>;
   sessions?: Maybe<Array<Session>>;
   sessionsCount?: Maybe<Scalars['Int']['output']>;
+  subscriptions?: Maybe<Array<Subscription>>;
+  subscriptionsCount?: Maybe<Scalars['Int']['output']>;
   teamMember?: Maybe<Array<TeamMember>>;
   teamMemberCount?: Maybe<Scalars['Int']['output']>;
 };
@@ -1888,6 +2041,20 @@ export type UserSessionsCountArgs = {
 };
 
 
+export type UserSubscriptionsArgs = {
+  cursor?: InputMaybe<SubscriptionWhereUniqueInput>;
+  orderBy?: Array<SubscriptionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SubscriptionWhereInput;
+};
+
+
+export type UserSubscriptionsCountArgs = {
+  where?: SubscriptionWhereInput;
+};
+
+
 export type UserTeamMemberArgs = {
   cursor?: InputMaybe<TeamMemberWhereUniqueInput>;
   orderBy?: Array<TeamMemberOrderByInput>;
@@ -1928,6 +2095,7 @@ export type UserCreateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionRelateToManyForCreateInput>;
+  subscriptions?: InputMaybe<SubscriptionRelateToManyForCreateInput>;
   teamMember?: InputMaybe<TeamMemberRelateToManyForCreateInput>;
 };
 
@@ -1973,6 +2141,7 @@ export type UserUpdateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionRelateToManyForUpdateInput>;
+  subscriptions?: InputMaybe<SubscriptionRelateToManyForUpdateInput>;
   teamMember?: InputMaybe<TeamMemberRelateToManyForUpdateInput>;
 };
 
@@ -1993,6 +2162,7 @@ export type UserWhereInput = {
   lastName?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
   sessions?: InputMaybe<SessionManyRelationFilter>;
+  subscriptions?: InputMaybe<SubscriptionManyRelationFilter>;
   teamMember?: InputMaybe<TeamMemberManyRelationFilter>;
 };
 
@@ -2044,6 +2214,20 @@ export type EventsQueryVariables = Exact<{
 
 
 export type EventsQuery = { __typename?: 'Query', eventsCount?: number | null, events?: Array<{ __typename: 'Event', id: string, name?: string | null, startsAt?: any | null, endsAt?: any | null, type?: string | null, location?: any | null, publishedAt?: any | null, createdAt?: any | null, updatedAt?: any | null, plusOneAllowed?: boolean | null, capacity?: number | null, stagesCount?: number | null, invitationsCount?: number | null }> | null };
+
+export type EventQueryVariables = Exact<{
+  where: EventWhereUniqueInput;
+}>;
+
+
+export type EventQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id: string, name?: string | null, startsAt?: any | null, endsAt?: any | null, type?: string | null, location?: any | null, publishedAt?: any | null, createdAt?: any | null, updatedAt?: any | null, plusOneAllowed?: boolean | null, capacity?: number | null, stagesCount?: number | null, invitationsCount?: number | null, stages?: Array<{ __typename: 'EventStage', id: string, name?: string | null, location?: any | null, stageDate?: any | null, endTime?: string | null }> | null } | null };
+
+export type EventInvitationsQueryVariables = Exact<{
+  where: EventWhereUniqueInput;
+}>;
+
+
+export type EventInvitationsQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id: string, invitations?: Array<{ __typename: 'Invitation', id: string, sentDate?: any | null, response?: string | null, plusOneName?: string | null, plusOneAllowed?: boolean | null, notes?: string | null, attendanceCount?: number | null, createdAt?: any | null, updatedAt?: any | null }> | null } | null };
 
 
 export const AuthenticatedItemDocument = gql`
@@ -2172,4 +2356,58 @@ export const EventsDocument = gql`
 
 export function useEventsQuery(options: Omit<Urql.UseQueryArgs<EventsQueryVariables>, 'query'>) {
   return Urql.useQuery<EventsQuery, EventsQueryVariables>({ query: EventsDocument, ...options });
+};
+export const EventDocument = gql`
+    query Event($where: EventWhereUniqueInput!) {
+  event(where: $where) {
+    id
+    name
+    startsAt
+    endsAt
+    type
+    location
+    publishedAt
+    createdAt
+    updatedAt
+    plusOneAllowed
+    capacity
+    stages {
+      __typename
+      id
+      name
+      location
+      stageDate
+      endTime
+    }
+    stagesCount
+    invitationsCount
+  }
+}
+    `;
+
+export function useEventQuery(options: Omit<Urql.UseQueryArgs<EventQueryVariables>, 'query'>) {
+  return Urql.useQuery<EventQuery, EventQueryVariables>({ query: EventDocument, ...options });
+};
+export const EventInvitationsDocument = gql`
+    query EventInvitations($where: EventWhereUniqueInput!) {
+  event(where: $where) {
+    id
+    invitations {
+      __typename
+      id
+      sentDate
+      response
+      plusOneName
+      plusOneAllowed
+      notes
+      attendanceCount
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `;
+
+export function useEventInvitationsQuery(options: Omit<Urql.UseQueryArgs<EventInvitationsQueryVariables>, 'query'>) {
+  return Urql.useQuery<EventInvitationsQuery, EventInvitationsQueryVariables>({ query: EventInvitationsDocument, ...options });
 };

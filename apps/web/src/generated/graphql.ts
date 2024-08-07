@@ -913,6 +913,8 @@ export type Mutation = {
   createInvitations?: Maybe<Array<Maybe<Invitation>>>;
   createSession?: Maybe<Session>;
   createSessions?: Maybe<Array<Maybe<Session>>>;
+  createSubscription?: Maybe<Subscription>;
+  createSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   createTeam?: Maybe<Team>;
   createTeamMember?: Maybe<TeamMember>;
   createTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -933,6 +935,8 @@ export type Mutation = {
   deleteInvitations?: Maybe<Array<Maybe<Invitation>>>;
   deleteSession?: Maybe<Session>;
   deleteSessions?: Maybe<Array<Maybe<Session>>>;
+  deleteSubscription?: Maybe<Subscription>;
+  deleteSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   deleteTeam?: Maybe<Team>;
   deleteTeamMember?: Maybe<TeamMember>;
   deleteTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -954,6 +958,8 @@ export type Mutation = {
   updateInvitations?: Maybe<Array<Maybe<Invitation>>>;
   updateSession?: Maybe<Session>;
   updateSessions?: Maybe<Array<Maybe<Session>>>;
+  updateSubscription?: Maybe<Subscription>;
+  updateSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   updateTeam?: Maybe<Team>;
   updateTeamMember?: Maybe<TeamMember>;
   updateTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -1041,6 +1047,16 @@ export type MutationCreateSessionArgs = {
 
 export type MutationCreateSessionsArgs = {
   data: Array<SessionCreateInput>;
+};
+
+
+export type MutationCreateSubscriptionArgs = {
+  data: SubscriptionCreateInput;
+};
+
+
+export type MutationCreateSubscriptionsArgs = {
+  data: Array<SubscriptionCreateInput>;
 };
 
 
@@ -1141,6 +1157,16 @@ export type MutationDeleteSessionArgs = {
 
 export type MutationDeleteSessionsArgs = {
   where: Array<SessionWhereUniqueInput>;
+};
+
+
+export type MutationDeleteSubscriptionArgs = {
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type MutationDeleteSubscriptionsArgs = {
+  where: Array<SubscriptionWhereUniqueInput>;
 };
 
 
@@ -1251,6 +1277,17 @@ export type MutationUpdateSessionsArgs = {
 };
 
 
+export type MutationUpdateSubscriptionArgs = {
+  data: SubscriptionUpdateInput;
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type MutationUpdateSubscriptionsArgs = {
+  data: Array<SubscriptionUpdateArgs>;
+};
+
+
 export type MutationUpdateTeamArgs = {
   data: TeamUpdateInput;
   where: TeamWhereUniqueInput;
@@ -1332,6 +1369,9 @@ export type Query = {
   session?: Maybe<Session>;
   sessions?: Maybe<Array<Session>>;
   sessionsCount?: Maybe<Scalars['Int']['output']>;
+  subscription?: Maybe<Subscription>;
+  subscriptions?: Maybe<Array<Subscription>>;
+  subscriptionsCount?: Maybe<Scalars['Int']['output']>;
   team?: Maybe<Team>;
   teamMember?: Maybe<TeamMember>;
   teamMembers?: Maybe<Array<TeamMember>>;
@@ -1474,6 +1514,25 @@ export type QuerySessionsArgs = {
 
 export type QuerySessionsCountArgs = {
   where?: SessionWhereInput;
+};
+
+
+export type QuerySubscriptionArgs = {
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type QuerySubscriptionsArgs = {
+  cursor?: InputMaybe<SubscriptionWhereUniqueInput>;
+  orderBy?: Array<SubscriptionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SubscriptionWhereInput;
+};
+
+
+export type QuerySubscriptionsCountArgs = {
+  where?: SubscriptionWhereInput;
 };
 
 
@@ -1650,6 +1709,94 @@ export type StringNullableFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  id: Scalars['ID']['output'];
+  stripeCurrentPeriodEnd?: Maybe<Scalars['DateTime']['output']>;
+  stripeCustomerId?: Maybe<Scalars['String']['output']>;
+  stripePriceId?: Maybe<Scalars['String']['output']>;
+  stripeSubscriptionId?: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Team>;
+  user?: Maybe<User>;
+};
+
+export type SubscriptionCreateInput = {
+  stripeCurrentPeriodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeCustomerId?: InputMaybe<Scalars['String']['input']>;
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  stripeSubscriptionId?: InputMaybe<Scalars['String']['input']>;
+  team?: InputMaybe<TeamRelateToOneForCreateInput>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type SubscriptionManyRelationFilter = {
+  every?: InputMaybe<SubscriptionWhereInput>;
+  none?: InputMaybe<SubscriptionWhereInput>;
+  some?: InputMaybe<SubscriptionWhereInput>;
+};
+
+export type SubscriptionOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  stripeCurrentPeriodEnd?: InputMaybe<OrderDirection>;
+  stripeCustomerId?: InputMaybe<OrderDirection>;
+  stripePriceId?: InputMaybe<OrderDirection>;
+  stripeSubscriptionId?: InputMaybe<OrderDirection>;
+};
+
+export type SubscriptionRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  create?: InputMaybe<Array<SubscriptionCreateInput>>;
+};
+
+export type SubscriptionRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  create?: InputMaybe<Array<SubscriptionCreateInput>>;
+  disconnect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  set?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+};
+
+export type SubscriptionRelateToOneForCreateInput = {
+  connect?: InputMaybe<SubscriptionWhereUniqueInput>;
+  create?: InputMaybe<SubscriptionCreateInput>;
+};
+
+export type SubscriptionRelateToOneForUpdateInput = {
+  connect?: InputMaybe<SubscriptionWhereUniqueInput>;
+  create?: InputMaybe<SubscriptionCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SubscriptionUpdateArgs = {
+  data: SubscriptionUpdateInput;
+  where: SubscriptionWhereUniqueInput;
+};
+
+export type SubscriptionUpdateInput = {
+  stripeCurrentPeriodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeCustomerId?: InputMaybe<Scalars['String']['input']>;
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  stripeSubscriptionId?: InputMaybe<Scalars['String']['input']>;
+  team?: InputMaybe<TeamRelateToOneForUpdateInput>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type SubscriptionWhereInput = {
+  AND?: InputMaybe<Array<SubscriptionWhereInput>>;
+  NOT?: InputMaybe<Array<SubscriptionWhereInput>>;
+  OR?: InputMaybe<Array<SubscriptionWhereInput>>;
+  id?: InputMaybe<IdFilter>;
+  stripeCurrentPeriodEnd?: InputMaybe<DateTimeNullableFilter>;
+  stripeCustomerId?: InputMaybe<StringFilter>;
+  stripePriceId?: InputMaybe<StringFilter>;
+  stripeSubscriptionId?: InputMaybe<StringFilter>;
+  team?: InputMaybe<TeamWhereInput>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type SubscriptionWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type Team = {
   __typename?: 'Team';
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -1660,6 +1807,7 @@ export type Team = {
   members?: Maybe<Array<TeamMember>>;
   membersCount?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  subscription?: Maybe<Subscription>;
 };
 
 
@@ -1696,6 +1844,7 @@ export type TeamCreateInput = {
   events?: InputMaybe<EventRelateToManyForCreateInput>;
   members?: InputMaybe<TeamMemberRelateToManyForCreateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<SubscriptionRelateToOneForCreateInput>;
 };
 
 export type TeamMember = {
@@ -1804,6 +1953,7 @@ export type TeamUpdateInput = {
   events?: InputMaybe<EventRelateToManyForUpdateInput>;
   members?: InputMaybe<TeamMemberRelateToManyForUpdateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<SubscriptionRelateToOneForUpdateInput>;
 };
 
 export type TeamWhereInput = {
@@ -1816,6 +1966,7 @@ export type TeamWhereInput = {
   id?: InputMaybe<IdFilter>;
   members?: InputMaybe<TeamMemberManyRelationFilter>;
   name?: InputMaybe<StringFilter>;
+  subscription?: InputMaybe<SubscriptionWhereInput>;
 };
 
 export type TeamWhereUniqueInput = {
@@ -1841,6 +1992,8 @@ export type User = {
   password?: Maybe<PasswordState>;
   sessions?: Maybe<Array<Session>>;
   sessionsCount?: Maybe<Scalars['Int']['output']>;
+  subscriptions?: Maybe<Array<Subscription>>;
+  subscriptionsCount?: Maybe<Scalars['Int']['output']>;
   teamMember?: Maybe<Array<TeamMember>>;
   teamMemberCount?: Maybe<Scalars['Int']['output']>;
 };
@@ -1888,6 +2041,20 @@ export type UserSessionsCountArgs = {
 };
 
 
+export type UserSubscriptionsArgs = {
+  cursor?: InputMaybe<SubscriptionWhereUniqueInput>;
+  orderBy?: Array<SubscriptionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SubscriptionWhereInput;
+};
+
+
+export type UserSubscriptionsCountArgs = {
+  where?: SubscriptionWhereInput;
+};
+
+
 export type UserTeamMemberArgs = {
   cursor?: InputMaybe<TeamMemberWhereUniqueInput>;
   orderBy?: Array<TeamMemberOrderByInput>;
@@ -1928,6 +2095,7 @@ export type UserCreateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionRelateToManyForCreateInput>;
+  subscriptions?: InputMaybe<SubscriptionRelateToManyForCreateInput>;
   teamMember?: InputMaybe<TeamMemberRelateToManyForCreateInput>;
 };
 
@@ -1973,6 +2141,7 @@ export type UserUpdateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionRelateToManyForUpdateInput>;
+  subscriptions?: InputMaybe<SubscriptionRelateToManyForUpdateInput>;
   teamMember?: InputMaybe<TeamMemberRelateToManyForUpdateInput>;
 };
 
@@ -1993,6 +2162,7 @@ export type UserWhereInput = {
   lastName?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
   sessions?: InputMaybe<SessionManyRelationFilter>;
+  subscriptions?: InputMaybe<SubscriptionManyRelationFilter>;
   teamMember?: InputMaybe<TeamMemberManyRelationFilter>;
 };
 
@@ -2045,6 +2215,20 @@ export type EventsQueryVariables = Exact<{
 
 export type EventsQuery = { __typename?: 'Query', eventsCount?: number | null, events?: Array<{ __typename: 'Event', id: string, name?: string | null, startsAt?: any | null, endsAt?: any | null, type?: string | null, location?: any | null, publishedAt?: any | null, createdAt?: any | null, updatedAt?: any | null, plusOneAllowed?: boolean | null, capacity?: number | null, stagesCount?: number | null, invitationsCount?: number | null }> | null };
 
+export type EventQueryVariables = Exact<{
+  where: EventWhereUniqueInput;
+}>;
+
+
+export type EventQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id: string, name?: string | null, startsAt?: any | null, endsAt?: any | null, type?: string | null, location?: any | null, publishedAt?: any | null, createdAt?: any | null, updatedAt?: any | null, plusOneAllowed?: boolean | null, capacity?: number | null, stagesCount?: number | null, invitationsCount?: number | null, stages?: Array<{ __typename: 'EventStage', id: string, name?: string | null, location?: any | null, stageDate?: any | null, endTime?: string | null }> | null } | null };
+
+export type EventInvitationsQueryVariables = Exact<{
+  where: EventWhereUniqueInput;
+}>;
+
+
+export type EventInvitationsQuery = { __typename?: 'Query', event?: { __typename?: 'Event', id: string, invitations?: Array<{ __typename: 'Invitation', id: string, sentDate?: any | null, response?: string | null, plusOneName?: string | null, plusOneAllowed?: boolean | null, notes?: string | null, attendanceCount?: number | null, createdAt?: any | null, updatedAt?: any | null }> | null } | null };
+
 
 export const AuthenticatedItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthenticatedItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticatedItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"firstName"}},{"kind":"Field","name":{"kind":"Name","value":"lastName"}},{"kind":"Field","name":{"kind":"Name","value":"avatarUrl"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"emailConfirmedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<AuthenticatedItemQuery, AuthenticatedItemQueryVariables>;
 export const AuthenticateUserWithPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AuthenticateUserWithPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authenticateUserWithPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"UserAuthenticationWithPasswordSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sessionToken"}},{"kind":"Field","name":{"kind":"Name","value":"item"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"UserAuthenticationWithPasswordFailure"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]} as unknown as DocumentNode<AuthenticateUserWithPasswordMutation, AuthenticateUserWithPasswordMutationVariables>;
@@ -2052,6 +2236,8 @@ export const RegisterUserDocument = {"kind":"Document","definitions":[{"kind":"O
 export const LogoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endSession"}}]}}]} as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>;
 export const CreateEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEvent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventCreateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEvent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"publishedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"plusOneAllowed"}},{"kind":"Field","name":{"kind":"Name","value":"capacity"}},{"kind":"Field","name":{"kind":"Name","value":"stages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"startTime"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"stagesCount"}}]}}]}}]} as unknown as DocumentNode<CreateEventMutation, CreateEventMutationVariables>;
 export const EventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Events"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventOrderByInput"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventWhereInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"events"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"publishedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"plusOneAllowed"}},{"kind":"Field","name":{"kind":"Name","value":"capacity"}},{"kind":"Field","name":{"kind":"Name","value":"stagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"invitationsCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"eventsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}]}]}}]} as unknown as DocumentNode<EventsQuery, EventsQueryVariables>;
+export const EventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Event"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventWhereUniqueInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"event"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"publishedAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"plusOneAllowed"}},{"kind":"Field","name":{"kind":"Name","value":"capacity"}},{"kind":"Field","name":{"kind":"Name","value":"stages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"stageDate"}},{"kind":"Field","name":{"kind":"Name","value":"endTime"}}]}},{"kind":"Field","name":{"kind":"Name","value":"stagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"invitationsCount"}}]}}]}}]} as unknown as DocumentNode<EventQuery, EventQueryVariables>;
+export const EventInvitationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"EventInvitations"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventWhereUniqueInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"event"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"invitations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"sentDate"}},{"kind":"Field","name":{"kind":"Name","value":"response"}},{"kind":"Field","name":{"kind":"Name","value":"plusOneName"}},{"kind":"Field","name":{"kind":"Name","value":"plusOneAllowed"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"attendanceCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]}}]} as unknown as DocumentNode<EventInvitationsQuery, EventInvitationsQueryVariables>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -2958,6 +3144,8 @@ export type Mutation = {
   createInvitations?: Maybe<Array<Maybe<Invitation>>>;
   createSession?: Maybe<Session>;
   createSessions?: Maybe<Array<Maybe<Session>>>;
+  createSubscription?: Maybe<Subscription>;
+  createSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   createTeam?: Maybe<Team>;
   createTeamMember?: Maybe<TeamMember>;
   createTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -2978,6 +3166,8 @@ export type Mutation = {
   deleteInvitations?: Maybe<Array<Maybe<Invitation>>>;
   deleteSession?: Maybe<Session>;
   deleteSessions?: Maybe<Array<Maybe<Session>>>;
+  deleteSubscription?: Maybe<Subscription>;
+  deleteSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   deleteTeam?: Maybe<Team>;
   deleteTeamMember?: Maybe<TeamMember>;
   deleteTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -2999,6 +3189,8 @@ export type Mutation = {
   updateInvitations?: Maybe<Array<Maybe<Invitation>>>;
   updateSession?: Maybe<Session>;
   updateSessions?: Maybe<Array<Maybe<Session>>>;
+  updateSubscription?: Maybe<Subscription>;
+  updateSubscriptions?: Maybe<Array<Maybe<Subscription>>>;
   updateTeam?: Maybe<Team>;
   updateTeamMember?: Maybe<TeamMember>;
   updateTeamMembers?: Maybe<Array<Maybe<TeamMember>>>;
@@ -3086,6 +3278,16 @@ export type MutationCreateSessionArgs = {
 
 export type MutationCreateSessionsArgs = {
   data: Array<SessionCreateInput>;
+};
+
+
+export type MutationCreateSubscriptionArgs = {
+  data: SubscriptionCreateInput;
+};
+
+
+export type MutationCreateSubscriptionsArgs = {
+  data: Array<SubscriptionCreateInput>;
 };
 
 
@@ -3186,6 +3388,16 @@ export type MutationDeleteSessionArgs = {
 
 export type MutationDeleteSessionsArgs = {
   where: Array<SessionWhereUniqueInput>;
+};
+
+
+export type MutationDeleteSubscriptionArgs = {
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type MutationDeleteSubscriptionsArgs = {
+  where: Array<SubscriptionWhereUniqueInput>;
 };
 
 
@@ -3296,6 +3508,17 @@ export type MutationUpdateSessionsArgs = {
 };
 
 
+export type MutationUpdateSubscriptionArgs = {
+  data: SubscriptionUpdateInput;
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type MutationUpdateSubscriptionsArgs = {
+  data: Array<SubscriptionUpdateArgs>;
+};
+
+
 export type MutationUpdateTeamArgs = {
   data: TeamUpdateInput;
   where: TeamWhereUniqueInput;
@@ -3377,6 +3600,9 @@ export type Query = {
   session?: Maybe<Session>;
   sessions?: Maybe<Array<Session>>;
   sessionsCount?: Maybe<Scalars['Int']['output']>;
+  subscription?: Maybe<Subscription>;
+  subscriptions?: Maybe<Array<Subscription>>;
+  subscriptionsCount?: Maybe<Scalars['Int']['output']>;
   team?: Maybe<Team>;
   teamMember?: Maybe<TeamMember>;
   teamMembers?: Maybe<Array<TeamMember>>;
@@ -3519,6 +3745,25 @@ export type QuerySessionsArgs = {
 
 export type QuerySessionsCountArgs = {
   where?: SessionWhereInput;
+};
+
+
+export type QuerySubscriptionArgs = {
+  where: SubscriptionWhereUniqueInput;
+};
+
+
+export type QuerySubscriptionsArgs = {
+  cursor?: InputMaybe<SubscriptionWhereUniqueInput>;
+  orderBy?: Array<SubscriptionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SubscriptionWhereInput;
+};
+
+
+export type QuerySubscriptionsCountArgs = {
+  where?: SubscriptionWhereInput;
 };
 
 
@@ -3695,6 +3940,94 @@ export type StringNullableFilter = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type Subscription = {
+  __typename?: 'Subscription';
+  id: Scalars['ID']['output'];
+  stripeCurrentPeriodEnd?: Maybe<Scalars['DateTime']['output']>;
+  stripeCustomerId?: Maybe<Scalars['String']['output']>;
+  stripePriceId?: Maybe<Scalars['String']['output']>;
+  stripeSubscriptionId?: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Team>;
+  user?: Maybe<User>;
+};
+
+export type SubscriptionCreateInput = {
+  stripeCurrentPeriodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeCustomerId?: InputMaybe<Scalars['String']['input']>;
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  stripeSubscriptionId?: InputMaybe<Scalars['String']['input']>;
+  team?: InputMaybe<TeamRelateToOneForCreateInput>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type SubscriptionManyRelationFilter = {
+  every?: InputMaybe<SubscriptionWhereInput>;
+  none?: InputMaybe<SubscriptionWhereInput>;
+  some?: InputMaybe<SubscriptionWhereInput>;
+};
+
+export type SubscriptionOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  stripeCurrentPeriodEnd?: InputMaybe<OrderDirection>;
+  stripeCustomerId?: InputMaybe<OrderDirection>;
+  stripePriceId?: InputMaybe<OrderDirection>;
+  stripeSubscriptionId?: InputMaybe<OrderDirection>;
+};
+
+export type SubscriptionRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  create?: InputMaybe<Array<SubscriptionCreateInput>>;
+};
+
+export type SubscriptionRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  create?: InputMaybe<Array<SubscriptionCreateInput>>;
+  disconnect?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+  set?: InputMaybe<Array<SubscriptionWhereUniqueInput>>;
+};
+
+export type SubscriptionRelateToOneForCreateInput = {
+  connect?: InputMaybe<SubscriptionWhereUniqueInput>;
+  create?: InputMaybe<SubscriptionCreateInput>;
+};
+
+export type SubscriptionRelateToOneForUpdateInput = {
+  connect?: InputMaybe<SubscriptionWhereUniqueInput>;
+  create?: InputMaybe<SubscriptionCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SubscriptionUpdateArgs = {
+  data: SubscriptionUpdateInput;
+  where: SubscriptionWhereUniqueInput;
+};
+
+export type SubscriptionUpdateInput = {
+  stripeCurrentPeriodEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeCustomerId?: InputMaybe<Scalars['String']['input']>;
+  stripePriceId?: InputMaybe<Scalars['String']['input']>;
+  stripeSubscriptionId?: InputMaybe<Scalars['String']['input']>;
+  team?: InputMaybe<TeamRelateToOneForUpdateInput>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type SubscriptionWhereInput = {
+  AND?: InputMaybe<Array<SubscriptionWhereInput>>;
+  NOT?: InputMaybe<Array<SubscriptionWhereInput>>;
+  OR?: InputMaybe<Array<SubscriptionWhereInput>>;
+  id?: InputMaybe<IdFilter>;
+  stripeCurrentPeriodEnd?: InputMaybe<DateTimeNullableFilter>;
+  stripeCustomerId?: InputMaybe<StringFilter>;
+  stripePriceId?: InputMaybe<StringFilter>;
+  stripeSubscriptionId?: InputMaybe<StringFilter>;
+  team?: InputMaybe<TeamWhereInput>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type SubscriptionWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type Team = {
   __typename?: 'Team';
   createdAt?: Maybe<Scalars['DateTime']['output']>;
@@ -3705,6 +4038,7 @@ export type Team = {
   members?: Maybe<Array<TeamMember>>;
   membersCount?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  subscription?: Maybe<Subscription>;
 };
 
 
@@ -3741,6 +4075,7 @@ export type TeamCreateInput = {
   events?: InputMaybe<EventRelateToManyForCreateInput>;
   members?: InputMaybe<TeamMemberRelateToManyForCreateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<SubscriptionRelateToOneForCreateInput>;
 };
 
 export type TeamMember = {
@@ -3849,6 +4184,7 @@ export type TeamUpdateInput = {
   events?: InputMaybe<EventRelateToManyForUpdateInput>;
   members?: InputMaybe<TeamMemberRelateToManyForUpdateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subscription?: InputMaybe<SubscriptionRelateToOneForUpdateInput>;
 };
 
 export type TeamWhereInput = {
@@ -3861,6 +4197,7 @@ export type TeamWhereInput = {
   id?: InputMaybe<IdFilter>;
   members?: InputMaybe<TeamMemberManyRelationFilter>;
   name?: InputMaybe<StringFilter>;
+  subscription?: InputMaybe<SubscriptionWhereInput>;
 };
 
 export type TeamWhereUniqueInput = {
@@ -3886,6 +4223,8 @@ export type User = {
   password?: Maybe<PasswordState>;
   sessions?: Maybe<Array<Session>>;
   sessionsCount?: Maybe<Scalars['Int']['output']>;
+  subscriptions?: Maybe<Array<Subscription>>;
+  subscriptionsCount?: Maybe<Scalars['Int']['output']>;
   teamMember?: Maybe<Array<TeamMember>>;
   teamMemberCount?: Maybe<Scalars['Int']['output']>;
 };
@@ -3933,6 +4272,20 @@ export type UserSessionsCountArgs = {
 };
 
 
+export type UserSubscriptionsArgs = {
+  cursor?: InputMaybe<SubscriptionWhereUniqueInput>;
+  orderBy?: Array<SubscriptionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SubscriptionWhereInput;
+};
+
+
+export type UserSubscriptionsCountArgs = {
+  where?: SubscriptionWhereInput;
+};
+
+
 export type UserTeamMemberArgs = {
   cursor?: InputMaybe<TeamMemberWhereUniqueInput>;
   orderBy?: Array<TeamMemberOrderByInput>;
@@ -3973,6 +4326,7 @@ export type UserCreateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionRelateToManyForCreateInput>;
+  subscriptions?: InputMaybe<SubscriptionRelateToManyForCreateInput>;
   teamMember?: InputMaybe<TeamMemberRelateToManyForCreateInput>;
 };
 
@@ -4018,6 +4372,7 @@ export type UserUpdateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   sessions?: InputMaybe<SessionRelateToManyForUpdateInput>;
+  subscriptions?: InputMaybe<SubscriptionRelateToManyForUpdateInput>;
   teamMember?: InputMaybe<TeamMemberRelateToManyForUpdateInput>;
 };
 
@@ -4038,6 +4393,7 @@ export type UserWhereInput = {
   lastName?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
   sessions?: InputMaybe<SessionManyRelationFilter>;
+  subscriptions?: InputMaybe<SubscriptionManyRelationFilter>;
   teamMember?: InputMaybe<TeamMemberManyRelationFilter>;
 };
 

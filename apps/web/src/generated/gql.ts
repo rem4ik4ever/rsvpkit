@@ -19,6 +19,8 @@ const documents = {
     "\nmutation Logout {\n  endSession\n}\n": types.LogoutDocument,
     "\nmutation CreateEvent($data: EventCreateInput!) {\n  createEvent(data: $data) {\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    createdBy {\n      __typename\n      name\n      email\n    }\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stages {\n      __typename\n      id\n      location\n      startTime\n      endTime\n    }\n    stagesCount\n  }\n}\n": types.CreateEventDocument,
     "\nquery Events($take: Int, $skip: Int!, $orderBy: [EventOrderByInput!]!, $where: EventWhereInput!) {\n  events(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n    __typename\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stagesCount\n    invitationsCount\n  }\n  eventsCount(where: $where)\n}\n": types.EventsDocument,
+    "\nquery Event($where: EventWhereUniqueInput!) {\n  event(where: $where) {\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stages {\n      __typename\n      id\n      name\n      location\n      stageDate\n      endTime\n    }\n    stagesCount\n    invitationsCount\n  }\n}\n": types.EventDocument,
+    "\nquery EventInvitations($where: EventWhereUniqueInput!) {\n  event(where: $where) {\n    id\n    invitations {\n      __typename\n      id\n      sentDate\n      response\n      plusOneName\n      plusOneAllowed\n      notes\n      attendanceCount\n      createdAt\n      updatedAt\n    }\n  }\n}\n": types.EventInvitationsDocument,
 };
 
 /**
@@ -59,6 +61,14 @@ export function graphql(source: "\nmutation CreateEvent($data: EventCreateInput!
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\nquery Events($take: Int, $skip: Int!, $orderBy: [EventOrderByInput!]!, $where: EventWhereInput!) {\n  events(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n    __typename\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stagesCount\n    invitationsCount\n  }\n  eventsCount(where: $where)\n}\n"): (typeof documents)["\nquery Events($take: Int, $skip: Int!, $orderBy: [EventOrderByInput!]!, $where: EventWhereInput!) {\n  events(take: $take, skip: $skip, orderBy: $orderBy, where: $where) {\n    __typename\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stagesCount\n    invitationsCount\n  }\n  eventsCount(where: $where)\n}\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\nquery Event($where: EventWhereUniqueInput!) {\n  event(where: $where) {\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stages {\n      __typename\n      id\n      name\n      location\n      stageDate\n      endTime\n    }\n    stagesCount\n    invitationsCount\n  }\n}\n"): (typeof documents)["\nquery Event($where: EventWhereUniqueInput!) {\n  event(where: $where) {\n    id\n    name\n    startsAt\n    endsAt\n    type\n    location\n    publishedAt\n    createdAt\n    updatedAt\n    plusOneAllowed\n    capacity\n    stages {\n      __typename\n      id\n      name\n      location\n      stageDate\n      endTime\n    }\n    stagesCount\n    invitationsCount\n  }\n}\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\nquery EventInvitations($where: EventWhereUniqueInput!) {\n  event(where: $where) {\n    id\n    invitations {\n      __typename\n      id\n      sentDate\n      response\n      plusOneName\n      plusOneAllowed\n      notes\n      attendanceCount\n      createdAt\n      updatedAt\n    }\n  }\n}\n"): (typeof documents)["\nquery EventInvitations($where: EventWhereUniqueInput!) {\n  event(where: $where) {\n    id\n    invitations {\n      __typename\n      id\n      sentDate\n      response\n      plusOneName\n      plusOneAllowed\n      notes\n      attendanceCount\n      createdAt\n      updatedAt\n    }\n  }\n}\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

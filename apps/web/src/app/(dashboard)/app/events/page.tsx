@@ -11,6 +11,7 @@ import { OrderDirection } from "@/generated/graphql";
 import { useEventsQuery } from "@/hooks/gql";
 import { format } from "date-fns";
 import { CirclePlusIcon, FileIcon, ListFilterIcon, MapPinIcon, MenuIcon, MoveHorizontalIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function EventsPage() {
   const [result] = useEventsQuery({
@@ -94,7 +95,9 @@ export default function EventsPage() {
                   {result.data?.events?.map((event) => (
                     <TableRow key={event.id}>
                       <TableCell className="hidden sm:table-cell">
-                        {event.name}
+                        <Link href={`/app/events/${event.id}`}>
+                          {event.name}
+                        </Link>
                       </TableCell>
                       <TableCell>
                         {event.invitationsCount}
